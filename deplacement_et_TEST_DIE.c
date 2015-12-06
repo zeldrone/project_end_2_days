@@ -6,7 +6,7 @@
 // Nom: afficher_intro
 // utilité: affiche l'introduction du turotiel en mode graphique
 // nombre de modifications: 2
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // entrées et sortie: la case sur laquelle le joueur est, le pointeur de potion, la direction du joueur,
 // les tableaux de valeurs et d'affichage, les coordonées de la case suivante, le mode graphique et les scores
 // sortie: la case par-dessus laquelle le joueur est après son déplacement
@@ -109,8 +109,8 @@ int objets_graphique(int buffer, int* potion, int direction_x, int direction_y,B
 // Nom: afficher_intro
 // utilité: affiche l'introduction du turotiel en mode graphique
 // nombre de modifications: 2
-// dernière modification: Baptiste, commentaire, 06/12
-// entrées et sortie: aucune;
+// dernière modification: Commentaire, 06/12/2015
+// entrées et sortie: +
 //////////////////////////////////////////////////////////////////////
 void afficher_intro()
 {
@@ -128,9 +128,9 @@ void afficher_intro()
 ///////////////////////////////////////////////////////////////////////
 // Nom: afficher_menu_graphique
 // utilité: affiche les regles en mode graphique
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 2
-// entrées et sortie: aucune;
+// entrées et sortie: +
 ///////////////////////////////////////////////////////////////////////
 
 void afficher_menu_graphique()
@@ -164,9 +164,9 @@ void afficher_menu_graphique()
 ///////////////////////////////////////////////////////////////////////
 // Nom: afficher_menu
 // utilité: affiche les regles
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 2
-// entrées et sortie: aucune;
+// entrées et sortie: +
 ///////////////////////////////////////////////////////////////////////
 void afficher_menu()
 {
@@ -192,9 +192,10 @@ void afficher_menu()
 ///////////////////////////////////////////////////////////////////////
 // Nom: fin_de_niveau
 // utilité: termine le jeu et enregistre le niveau auquel le jouer s'arrête
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 3
-// entrées et sortie: aucune;
+// entrées :niveau
+// sorties: +
 ///////////////////////////////////////////////////////////////////////
 void fin_de_niveau(int niveau)
 {
@@ -207,10 +208,10 @@ void fin_de_niveau(int niveau)
 ///////////////////////////////////////////////////////////////////////
 // Nom: deplacement_graphique
 // utilité: gère le déplacement de l'ennemi
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 8
 // entrées: le tableau de valeurs, le pointeurs de score
-// sortie: rien
+// sortie: +
 ///////////////////////////////////////////////////////////////////////
 int deplacement_graphique(char tab[15][19], int* score, int* clef, int precedent, int* potion, BITMAP* affiche[15][19], BITMAP* affiche2[NBSPRITE], int mode_graphique, int score_general, int niveau, int* marteau)
 {
@@ -308,11 +309,11 @@ int deplacement_graphique(char tab[15][19], int* score, int* clef, int precedent
 ///////////////////////////////////////////////////////////////////////
 // Nom: affichage_graphique
 // utilité: gère l'affichage graphique
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 3
 // entrées: le tableau d'affichage, le mode graphique, le score général et celui du niveau,
 // le tableau des différentes images, le tableau de valeurs
-// sortie: rien;
+// sortie: +
 ///////////////////////////////////////////////////////////////////////
 void affichage_graphique(BITMAP* affiche[15][19], int mode_graphique, int score, int score_niveau, BITMAP* affiche2[NBSPRITE], char tab[15][19])
 {
@@ -346,10 +347,10 @@ void affichage_graphique(BITMAP* affiche[15][19], int mode_graphique, int score,
 ///////////////////////////////////////////////////////////////////////
 // Nom: init_mode_graphique
 // utilité: charge les images
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 4
 // entrées: le mode graphique, le tableau des différentes images
-// sortie: rien;
+// sortie:+
 ///////////////////////////////////////////////////////////////////////
 void init_mode_graphique(int mode_graphique,BITMAP* affiche2[NBSPRITE])
 {
@@ -411,10 +412,10 @@ void init_mode_graphique(int mode_graphique,BITMAP* affiche2[NBSPRITE])
 ///////////////////////////////////////////////////////////////////////
 // Nom: update_affichage_graphique
 // utilité: gère l'affichage graphique
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 5
 // entrées: le tableau de valeurs,le tableau d'affichage, le tableau des différentes images
-// sortie: rien;
+// sortie: +
 ///////////////////////////////////////////////////////////////////////
 void update_affichage_graphique(char tab[15][19], BITMAP* affiche[15][19], BITMAP* affiche2[NBSPRITE])
 {
@@ -496,10 +497,10 @@ void update_affichage_graphique(char tab[15][19], BITMAP* affiche[15][19], BITMA
 ///////////////////////////////////////////////////////////////////////
 // Nom: affichage_graphique
 // utilité: gère l'affichage graphique
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 8
 // entrées: le tableau de valeurs, le nombre d'ennemis, les coordonées des ennemis, le niveau, les compteurs des ennemis, le nombre de mouvements de chaque ennemis, l'hypothétique nom du niveau
-// sortie: rien;
+// sortie: +
 ///////////////////////////////////////////////////////////////////////
 void init_move_ennemis(char tab[15][19], int nb_ennemis, int coord_ennemis[nb_ennemis][2], FILE* ennemis[nb_ennemis], int niveau, int compteurs_ennemis[nb_ennemis], int compteur_max[nb_ennemis], int precedent_ennemi[nb_ennemis], char mot[50])
 {
@@ -533,10 +534,10 @@ void init_move_ennemis(char tab[15][19], int nb_ennemis, int coord_ennemis[nb_en
 ///////////////////////////////////////////////////////////////////////
 // Nom: move_ennemis
 // utilité: gère le déplacement des ennemis
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 10
 // entrées: le fichier de l'ennemi, le tableau de valeurs, la case par-dessus laquelle est l'ennemi,son compteur de mouvement, ses coordonnées, le tableau de changements, le compteur de changements
-// sorties: rien;
+// sorties: +
 ///////////////////////////////////////////////////////////////////////
 int move_ennemis(FILE* ennemis, char tab[15][19], int precedent_ennemi, int coord[2], int compteur, int changement[50][2], int* emplacement )
 {
@@ -577,7 +578,7 @@ int move_ennemis(FILE* ennemis, char tab[15][19], int precedent_ennemi, int coor
 ///////////////////////////////////////////////////////////////////////
 // Nom: jeu_graphique
 // utilité: gère le jeu
-// dernière modification: Baptiste, commentaire, 06/12
+// dernière modification: Commentaire, 06/12/2015
 // nombre de modifications: 25
 // entrées: le niveau, un pointeur sur le score général, potentiellement le nom du niveau
 // sorties: un statut d'exécution (recommencer niveau, interrompre, execution normale)
