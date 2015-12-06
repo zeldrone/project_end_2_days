@@ -92,36 +92,49 @@ void saisie_nom(char imput[50])
  //Nature de la dernière modif :Commentaire et correction des warnings
  //Version : 8.0
  ////////////////////////////////////////////////
-    BITMAP* sauvegarde;
+    BITMAP* sauvegarde;//0 déclaration des variables locales
     BITMAP* buffer;
     int i;
     int read;
-    buffer=create_bitmap(TSPRITE*19, TSPRITE*15);
-    clear_to_color(buffer,makecol(0,0,0));
+    buffer=create_bitmap(TSPRITE*19, TSPRITE*15);//création d'une image
+    clear_to_color(buffer,makecol(0,0,0));//noire
     sauvegarde= create_bitmap(19* TSPRITE, 15*TSPRITE);
-    textprintf_ex(buffer, font, 192-2*32,160+7*LIGNE,makecol(255,255,255),-1,"quel est votre pseudo?");
+    textprintf_ex(buffer, font, 192-2*32,160+7*LIGNE,makecol(255,255,255),-1,"quel est votre pseudo?");//affiche une demande de pseudo
     sauvegarde= create_bitmap(19* TSPRITE, 15*TSPRITE);
     blit(buffer, sauvegarde, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
     blit(sauvegarde, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
     clear_keybuf();
     Sleep(200);
-    while(!key[KEY_ENTER])
+    while(!key[KEY_ENTER])//tant que l'utilisateur n'appuie pas sur entree: c'est àdire tant qu'il continue à écrire son pseudo
     {
-        if (key[KEY_BACKSPACE])
+        if (key[KEY_BACKSPACE])//gère l'effaçage
         {
-            if (imput[i]!='\0') imput[--i] = '\0';
-            blit(sauvegarde, buffer, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-            textprintf_ex(buffer, font, 192-2*32,160+9*LIGNE,makecol(255,255,255),-1,"%s", imput);
+           if (i>0) i--; //efface la dernière lettre de la chaîne de caractère (fonction effacer)
+           imput[i]='\0';
+           if (i=0)
+           {
+            imput [i]=' ';
+            imput [i+1]='\0';
+           }
+           blit(sauvegarde, buffer, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);//remet le buffer à l'état initial
+           textprintf_ex(buffer, font, 192-2*32,160+9*LIGNE,makecol(255,255,255),-1,"%s", imput);//écris le mot inclu dans imput à l'endroit désiré
         }
-        if (i>49) break;
         blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
         read= readkey();
         imput[i]= read & 0xff;
-        if ((imput[i]>=32)||(imput[i]>=126))
+        if ((imput[i]>=32)||(imput[i]>=126))//si le mot fait partie des caractères utiles de la table ASCII
         {
-
-            textprintf_ex(buffer, font, 192-2*32+i*text_length(font, "O"),160+9*LIGNE,makecol(255,255,255),-1,"%c", imput[i]);
-            imput[++i] = '\0';
+             if (i>48) //blindage sur le pseudo
+        {
+         allegro_message("Le mot est trop long.");
+         
+        }
+            else //si le mot est pas trop long
+            {
+             imput[++i] = '\0';
+             blit(sauvegarde, buffer, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);//remet le buffer à l'état initial
+             textprintf_ex(buffer, font, 192-2*32,160+9*LIGNE,makecol(255,255,255),-1,"%s", imput);//écris le mot inclu dans imput à l'endroit désiré
+            }
         }
     }
     destroy_bitmap(buffer);
