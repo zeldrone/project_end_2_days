@@ -2,6 +2,7 @@
 #include <winalleg.h>
 #include "header_allegro.h"
 #include "header.h"
+
 void afficher_intro()
 {
     BITMAP* buffer;
@@ -239,6 +240,7 @@ void affichage_graphique(BITMAP* affiche[15][19], int mode_graphique, int score,
     {
         fond=load_bitmap("fond_star_wars.bmp", NULL);
         draw_sprite(buffer, fond,0,0);
+        destroy_bitmap(fond);
     }
 
     for(i=0; i<15; i++)
@@ -248,8 +250,8 @@ void affichage_graphique(BITMAP* affiche[15][19], int mode_graphique, int score,
             if (affiche[i][j]!=NULL) draw_sprite(buffer, affiche[i][j], j*TSPRITE, i*TSPRITE);
         }
     }
-    textprintf_ex(buffer, font, 15*TSPRITE, TSPRITE-13, makecol(255, 0,0),-1, "Score: %d", score);
-    textprintf_ex(buffer, font, 15*TSPRITE, TSPRITE+3, makecol(255, 0,0),-1, "Score niveau: %d", score_niveau);
+    textprintf_ex(buffer, font, 15*TSPRITE-20, 7, makecol(255, 0,0),-1, "Score: %d", score);
+    textprintf_ex(buffer, font, 15*TSPRITE-20, 10+LIGNE, makecol(255, 0,0),-1, "Score niveau: %d", score_niveau);
     blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
     destroy_bitmap(buffer);
 }
@@ -260,50 +262,52 @@ void init_mode_graphique(int mode_graphique,BITMAP* affiche2[NBSPRITE])
     switch(mode_graphique)
     {
     case 1:
-        affiche2[0]=load_bitmap("pingouin.bmp", NULL);
+        affiche2[0]=load_bitmap("Bmp/pingouin.bmp", NULL);
         // le personnage
-        affiche2[1]=load_bitmap("mur.bmp", NULL);
+        affiche2[1]=load_bitmap("Bmp/mur.bmp", NULL);
         // les murs
-        affiche2[2]=load_bitmap("serrure.bmp", NULL);
+        affiche2[2]=load_bitmap("Bmp/serrure.bmp", NULL);
         // les serrures
-        affiche2[3]=load_bitmap("clef.bmp", NULL);
+        affiche2[3]=load_bitmap("Bmp/clef.bmp", NULL);
         // les clef
-        affiche2[4]=load_bitmap("glace_double.bmp", NULL);
+        affiche2[4]=load_bitmap("Bmp/glace_double.bmp", NULL);
         // la glace double
-        affiche2[5]=load_bitmap("ghost.bmp", NULL);
+        affiche2[5]=load_bitmap("Bmp/ghost.bmp", NULL);
         // les ennemis
-        affiche2[6]=load_bitmap("eau.bmp", NULL);
+        affiche2[6]=load_bitmap("Bmp/eau.bmp", NULL);
         // l'eau
-        affiche2[7]=load_bitmap("glace.bmp", NULL);
+        affiche2[7]=load_bitmap("Bmp/glace.bmp", NULL);
         // la glace
-        affiche2[8]=load_bitmap("sortie.bmp", NULL);
+        affiche2[8]=load_bitmap("Bmp/sortie.bmp", NULL);
         // la porte de sortie
-        affiche2[9]=load_bitmap("rocher1.bmp", NULL);
+        affiche2[9]=load_bitmap("Bmp/rocher1.bmp", NULL);
         // les rochers
-        affiche2[10]=load_bitmap("potion.bmp", NULL);
+        affiche2[10]=load_bitmap("Bmp/potion.bmp", NULL);
         // les potions
-        affiche2[11]=load_bitmap("tunnel1.bmp", NULL);
+        affiche2[11]=load_bitmap("Bmp/tunnel1.bmp", NULL);
         // les tunnels
-        affiche2[12]=load_bitmap("turbo.bmp", NULL);
-
-        affiche2[14]=load_bitmap("teleport.bmp", NULL);
-        affiche2[15]=load_bitmap("teleport2.bmp", NULL);
-        affiche2[16]=load_bitmap("teleport3.bmp", NULL);
-        affiche2[17]=load_bitmap("teleport4.bmp", NULL);
-        affiche2[13]=load_bitmap("marteau1.bmp", NULL);
+        affiche2[12]=load_bitmap("Bmp/turbo.bmp", NULL);
+        // le turbo
+        affiche2[14]=load_bitmap("Bmp/teleport.bmp", NULL);
+        affiche2[15]=load_bitmap("Bmp/teleport2.bmp", NULL);
+        affiche2[16]=load_bitmap("Bmp/teleport3.bmp", NULL);
+        affiche2[17]=load_bitmap("Bmp/teleport4.bmp", NULL);
+        //Les teleporteurs
+        affiche2[13]=load_bitmap("Bmp/marteau1.bmp", NULL);
+        // le marteau
         break;
     case 2:
-        affiche2[0]=load_bitmap("Darth-Vader.bmp", NULL);
+        affiche2[0]=load_bitmap("Bmp/Darth-Vader.bmp", NULL);
         affiche2[1]=NULL;
-        affiche2[2]=load_bitmap("master_yoda.bmp", NULL);
-        affiche2[3]=load_bitmap("sabre_laser18.bmp", NULL);
-        affiche2[4]=load_bitmap("star_wars_double.bmp", NULL);
-        affiche2[5]=load_bitmap("X-wing.bmp", NULL);
-        affiche2[6]=load_bitmap("Space.bmp", NULL);
-        affiche2[7]=load_bitmap("star_wars_floor.bmp", NULL);
-        affiche2[8]=load_bitmap("Death_Star.bmp", NULL);
-        //affiche2[9]=load_bitmap(".bmp", NULL);
-        //affiche2[10]=load_bitmap(".bmp", NULL);*/
+        affiche2[2]=load_bitmap("Bmp/master_yoda.bmp", NULL);
+        affiche2[3]=load_bitmap("Bmp/sabre_laser18.bmp", NULL);
+        affiche2[4]=load_bitmap("Bmp/star_wars_double.bmp", NULL);
+        affiche2[5]=load_bitmap("Bmp/X-wing.bmp", NULL);
+        affiche2[6]=load_bitmap("Bmp/Space.bmp", NULL);
+        affiche2[7]=load_bitmap("Bmp/star_wars_floor.bmp", NULL);
+        affiche2[8]=load_bitmap("Bmp/Death_Star.bmp", NULL);
+        affiche2[9]=load_bitmap("Bmp/deathstar_fire1.bmp", NULL);
+        //affiche2[10]=load_bitmap(".bmp", NULL);
         //affiche2[11]=load_bitamp(".bmp", NULL);
         break;
     }
@@ -392,7 +396,7 @@ void init_move_ennemis(char tab[15][19], int nb_ennemis, int coord_ennemis[nb_en
     for(i=0; i<nb_ennemis; i++)
     {
         if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")))sprintf(nom, "ennemi.%s.%d.txt",mot, i);
-        else sprintf(nom, "ennemi.niveau%d.%d.txt", niveau, i);
+        else sprintf(nom, "ennemi.niveau%d.%d.txt", niveau+1, i+1);
         ennemis[i]=fopen(nom, "r");
         compteurs_ennemis[i]=1;
         precedent_ennemi[i]=0;
@@ -462,7 +466,8 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
     fichier[3] = fopen("niveau4.txt","r");
     fichier[4] = fopen("niveau5.txt","r");
     fichier[5] = fopen("niveausauvegarde.txt","r");
-
+    time_t debut;
+    time_t mesure;
     int precedent=0;
     int i;
     int x,y;
@@ -520,7 +525,7 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
     else
     {
         update_tab_affiche(valeurs, affiche_console);
-        initialisation_console(valeurs, affiche_console, *score, 0);
+        initialisation_console(affiche_console, *score, 0);
         if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")==0))
         {
             gotoligcol(POS_ECRAN_Y/2,POS_ECRAN_X/3);
@@ -532,7 +537,7 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
     }
 
 
-
+    time(&debut);
     recherche_sortie_et_ennemis(valeurs, &xsortie, &ysortie, &tunnel, &nb_ennemis);
     recherche_joueur(valeurs, &x, &y);
     nb_cases_glace= update_cases_glace(valeurs);
@@ -554,7 +559,7 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
             if (emplacement!= POS_ECRAN_X)
             {
                 system("cls");
-                initialisation_console(valeurs, affiche_console,*score, score_niveau);
+                initialisation_console(affiche_console,*score, score_niveau);
             }
             emplacement=0;
             i=0;
@@ -624,18 +629,12 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
                 update_tab_affiche(valeurs, affiche_console);
                 affichage(changement, affiche_console, emplacement);
                 affichage_score(score, score_niveau);
-                if((kbhit())&&(getch()=='h'))
-                   {
-                       afficher_menu();
-                       system("pause");
-                        system("cls");
-                        initialisation_console(valeurs, affiche_console, *score, score_niveau);
-                   }
-                //if(())
-            }
 
+            }
             nb_cases_eau= update_cases_eau(valeurs);
             recherche_joueur(valeurs, &x, &y);
+            time(&mesure);
+            if(difftime(mesure, debut))score_niveau= ((int)difftime(mesure, debut)+1000)*nb_cases_eau/(int)difftime(mesure, debut);
             if((x!=xsortie)||(y!=ysortie))
             {
                 switch (TEST_DIE(valeurs, cle, niveau, score, precedent, mode_graphique, marteau))
@@ -648,9 +647,9 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
             }
             if ((x==xsortie)&&(y==ysortie)&&(nb_cases_eau!=nb_cases_glace))
             {
-                system("cls");
-                if(mode_graphique) allegro_message("Vous avez oublie %d cases!",nb_cases_glace-nb_cases_eau);
-                else printf("\n\nVous avez oublie %d cases!", nb_cases_glace-nb_cases_eau);
+                //system("cls");
+                if(mode_graphique) allegro_message("Vous avez oublie %d %d-%d cases!",niveau,nb_cases_glace,nb_cases_eau);
+                else printf("\n\nVous avez oublie %d - %d cases!", nb_cases_glace, nb_cases_eau);
                 Sleep(1000);
                 switch(afficher_mort(score, niveau, mode_graphique))
                 {
@@ -673,7 +672,7 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
                 gotoligcol(POS_ECRAN_Y,POS_ECRAN_X);
 
                 update_tab_affiche(valeurs, affiche_console);
-                initialisation_console(valeurs, affiche_console, *score, score_niveau);
+                initialisation_console(affiche_console, *score, score_niveau);
             }
             nb_cases_glace= update_cases_glace(valeurs);
             nb_cases_eau= 0;
@@ -685,7 +684,7 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
             boucle=0;
         }
     }
-
+    for (i=0; i<NBSPRITE; i++) if(affiche2[i]!=NULL)destroy_bitmap(affiche2[i]);
     (*score)+=score_niveau;
     return 0;
 }

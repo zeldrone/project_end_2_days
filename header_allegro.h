@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #define TSPRITE 32
 #define LIGNE text_height(font)
 #define NBSPRITE 18

@@ -3,6 +3,102 @@
 
 #include "header.h"
 #include "header_allegro.h"
+void afficher_menu_principal()
+{
+    int POS_ECRAN_X, POS_ECRAN_Y;
+    getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
+    gotoligcol(POS_ECRAN_Y, POS_ECRAN_X);
+        printf ("\t\t\t MENU \n");
+        printf ("\tPour une meilleure jouabilite, mettez la fenetre en plein ecran\n");
+        printf ("\t    ecrivez sans fautes d'orthographe! \n");
+        printf ("Ecrivez 'jouer' pour commencer a jouer ! \n");
+        printf ("Ecrivez 'reprendre' pour reprendre votre partie sauvegardee ! \n");
+        printf ("Ecrivez 'tutoriel' si vous jouez pour la premiere fois ! \n");
+        printf ("Ecrivez 'options' pour modifier vos options ! \n");
+        printf ("Ecrivez 'editer' pour acceder a l'editeur de niveau\n");
+        printf ("Ecrivez 'niveaux' pour acceder aux niveaux crees!\n");
+        printf ("Ecrivez 'scores' pour acceder aux scores precedentd\n");
+        printf ("Ecrivez 'quitter' pour quitter le jeu !\n");
+}
+void game_exit(int mode_graphique, int buff, int score)
+{
+    char input[50];
+    int i;
+    if (mode_graphique)
+            {
+                BITMAP* buffer;
+                buffer=create_bitmap(TSPRITE*19, TSPRITE*15);
+                clear_to_color(buffer,makecol(0,0,0));
+                if(menu_oui_non(buffer, "score"));
+                else
+                {
+                    saisie_nom(input);
+                    sauvegarde_score(input, score);
+                }
+                destroy_bitmap(buffer);
+                clear_keybuf();
+                set_gfx_mode(GFX_TEXT,80,25,0,0);
+                allegro_exit();
+            }
+            else
+            {
+                system("cls");
+                printf("voulez-vous sauvegarder ce score?\n entrez 0 pour non ou 1 pour oui\n");
+                scanf("%d", &i);
+                if(i) sauvegarde_score(input, score);
+
+            }
+}
+void sauvegarde_score(char imput[50], int score)
+{
+    FILE* fichier_score;
+    int i;
+    fichier_score= fopen("scores.txt", "r+");
+    fseek(fichier_score, 0, SEEK_SET);
+    fscanf(fichier_score,"%d", &i);
+    fseek(fichier_score, 0, SEEK_SET);
+    fprintf(fichier_score,"%d\n", ++i);
+    fseek(fichier_score, 0, SEEK_END);
+    fprintf(fichier_score,"%s %d\n", imput, score);
+    fclose(fichier_score);
+}
+void saisie_nom(char imput[50])
+{
+    BITMAP* sauvegarde;
+    BITMAP* buffer;
+    int i;
+    int read;
+    buffer=create_bitmap(TSPRITE*19, TSPRITE*15);
+    clear_to_color(buffer,makecol(0,0,0));
+    sauvegarde= create_bitmap(19* TSPRITE, 15*TSPRITE);
+    textprintf_ex(buffer, font, 192-2*32,160+7*LIGNE,makecol(255,255,255),-1,"quel est votre pseudo?");
+    sauvegarde= create_bitmap(19* TSPRITE, 15*TSPRITE);
+    blit(buffer, sauvegarde, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+    blit(sauvegarde, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+    clear_keybuf();
+    Sleep(200);
+    while(!key[KEY_ENTER])
+    {
+        if (key[KEY_BACKSPACE])
+        {
+            if (imput[i]!='\0') imput[--i] = '\0';
+            blit(sauvegarde, buffer, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+            textprintf_ex(buffer, font, 192-2*32,160+9*LIGNE,makecol(255,255,255),-1,"%s", imput);
+        }
+        if (i>49) break;
+        blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+        read= readkey();
+        imput[i]= read & 0xff;
+        if ((imput[i]>=32)||(imput[i]>=126))
+        {
+
+            textprintf_ex(buffer, font, 192-2*32+i*text_length(font, "O"),160+9*LIGNE,makecol(255,255,255),-1,"%c", imput[i]);
+            imput[++i] = '\0';
+        }
+    }
+    destroy_bitmap(buffer);
+    destroy_bitmap(sauvegarde);
+}
 void allegro_demarre(int mode_graphique)
 {
     if (mode_graphique)
@@ -41,13 +137,17 @@ void reprendre(int mode_graphique, int* score)
     for (i=buff; i<5; i++)
     {
         switch(jeu_graphique(i, score, mode_graphique, NULL))
-                {
-                case 1:
-                    i--;
-                    break;
-                case 3:
-                    i=5;
-                }
+        {
+        case 1:
+            i--;
+            break;
+        case 3:
+            i=5;
+            break;
+        default:
+            break;
+
+        }
     }
 }
 void mes_niveaux(int* score, int mode_graphique)
@@ -93,18 +193,18 @@ void mes_niveaux(int* score, int mode_graphique)
     }
 
 }
-
-
-void fonction_scores (FILE* fichier)
+void fonction_scores ()
 {
+    FILE* fichier;
     int nb,i, score;
     char tab [50];
+    fichier= fopen("scores.txt", "r+");
     fscanf(fichier, "%d", &nb);
     for(i=0; i<nb; i++)
     {
         fscanf(fichier, "%s", tab);
         fscanf(fichier, "%d", &score);
-        printf("%s %d", tab, score);
+        printf("%s %d\n", tab, score);
     }
 }
 void fonction_options (int* score, int* mode_graphique, int *mode_son)
@@ -145,7 +245,7 @@ void fonction_admin (int mode_graphique, int* score)
         case 5:
             if(mode_graphique)allegro_demarre(mode_graphique);
             else getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
-            for(i=entre; i<5; i++)
+            for(i=entre; i<=5; i++)
             {
                 switch(jeu_graphique(i-1, score, mode_graphique, NULL))
                 {
@@ -166,34 +266,18 @@ void fonction_admin (int mode_graphique, int* score)
 
 int main()
 {
-    int x=0, i=0, buff;
+    int x=0, buff;
     int score=0, niveau=0;
-    int read;
     char imput [50];
     int mode_graphique=0, mode_son=0;
-    BITMAP* sauvegarde;
-    FILE* fichier_score;
     int POS_ECRAN_Y=0;
     int POS_ECRAN_X=0;
-    fichier_score= fopen("scores.txt", "r+");
-
 
     while (x==0)
     {
-        printf ("\t\t\t MENU \n");
-        printf ("\tmettez IMPERATIVEMENT la console en PLEIN ECRAN\n");
-        printf ("\t    ecrivez sans fautes d'orthographe! \n");
-        printf ("Ecrivez 'jouer' pour commencer a jouer ! \n");
-        printf ("Ecrivez 'reprendre' pour reprendre votre partie sauvegardee ! \n");
-        printf ("Ecrivez 'tutoriel' si vous jouez pour la premiere fois ! \n");
-        printf ("Ecrivez 'options' pour modifier vos options ! \n");
-        printf ("Ecrivez 'editer' pour acceder a l'editeur de niveau\n");
-        printf ("Ecrivez 'niveaux' pour acceder aux niveaux crees!\n");
-        printf ("Ecrivez 'scores' pour acceder aux scores precedentd\n");
-        printf ("Ecrivez 'quitter' pour quitter le jeu !\n");
-
-
+        afficher_menu_principal();
         scanf ("%s",imput);
+
         if (strcmp (imput,"jouer")==0)
         {
             getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
@@ -209,59 +293,12 @@ int main()
                     buff=niveau;
                     niveau=5;
                 }
-                x++;
             }
-            if (mode_graphique)
-            {
-                BITMAP* buffer;
-                buffer=create_bitmap(TSPRITE*19, TSPRITE*15);
-                clear_to_color(buffer,makecol(0,0,0));
-                if(menu_oui_non(buffer, "score")) fin_de_niveau(buff);
-                else
-                {
-                    sauvegarde= create_bitmap(19* TSPRITE, 15*TSPRITE);
-                    textprintf_ex(buffer, font, 192-2*32,160+7*LIGNE,makecol(255,255,255),-1,"quel est votre pseudo?");
-                    sauvegarde= create_bitmap(19* TSPRITE, 15*TSPRITE);
-                    blit(buffer, sauvegarde, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-                    blit(sauvegarde, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-                    clear_keybuf();
-                    i=0;
-                    while(i<49)
-                    {
-
-                        blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-                        read= readkey();
-                        imput[i]= read & 0xff;
-                        if ((imput[i]<32)||(imput[i]>126))
-                        {
-                            imput[i--] = '\0';
-                            if (read==KEY_BACKSPACE) blit(sauvegarde, buffer, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-                            if (read==KEY_ENTER) i=50;
-                        }
-                        else
-                        {
-
-                            textprintf_ex(buffer, font, 192-2*32+i*text_length(font, "O"),160+9*LIGNE,makecol(255,255,255),-1,"%c", imput[i]);
-                            imput[++i] = '\0';
-                        }
-
-
-                    }
-                    fseek(fichier_score, 0, SEEK_SET);
-                    fscanf(fichier_score,"%d", &i);
-                    fseek(fichier_score, 0, SEEK_SET);
-                    fprintf(fichier_score,"%d\n", ++i);
-                    fseek(fichier_score, 0, SEEK_END);
-                    fprintf(fichier_score,"%s %d\n", imput, score);
-                    fclose(fichier_score);
-                    allegro_exit();
-                    return 0;
-                }
-            }
-
+            game_exit(mode_graphique, buff, score);
         }
         else if (strcmp (imput,"reprendre")==0)
         {
+            allegro_demarre(mode_graphique);
             reprendre(mode_graphique, &score);
 
         }
@@ -276,8 +313,9 @@ int main()
         }
         else if (strcmp (imput, "scores")==0)
         {
-            fonction_scores(fichier_score);
+            fonction_scores();
             system("pause");
+            system("cls");
         }
         else if (strcmp (imput, "options")==0)
         {
@@ -306,7 +344,8 @@ int main()
         else
         {
             printf ("Ce n'est pas un choix correct, veuillez recommencer\n");
-            Sleep(500);
+            Sleep(700);
+            system("cls");
 
         }
     }

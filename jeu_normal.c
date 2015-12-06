@@ -167,11 +167,12 @@ int update_cases_eau(char tab[15][19])
     }
     return val;
 }
-void initialisation_console(char tab[15][19], char affiche_console[15][19], int score, int score_niveau)
+void initialisation_console(char affiche_console[15][19], int score, int score_niveau)
 {
     int i,j;
     int POS_ECRAN_Y=0;
     int POS_ECRAN_X=0;
+    system("cls");
     getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
     for(i=0; i<15; i++)
     {
@@ -256,6 +257,7 @@ void deplacement(char tab[15][19], int *clef,int score_general, int* score, int 
 {
     int i,j,x,y,z=1;
     char move;
+    update_tab_affiche(tab, affiche);
     int test=0;
 //on repère la case avec le joueur
     for(i=0; i<15; i++)
@@ -319,9 +321,13 @@ void deplacement(char tab[15][19], int *clef,int score_general, int* score, int 
             break;
 
         case 'x':
+            system("cls");
             fin_de_niveau(niveau);
             break;
-
+        case 'h':
+            afficher_menu();
+            system("pause");
+            initialisation_console(affiche, score_general, *score);
         default :
             (*emplacement)--;
         }
@@ -338,7 +344,6 @@ void deplacement(char tab[15][19], int *clef,int score_general, int* score, int 
                 i=case_suivante_joueur;
                 tab[changement[*emplacement][1]][changement[*emplacement][0]]=tab[y][x];
                 *precedent= *precedent-z;
-                (*score)+=z;
                 tab[y][x]=*precedent;
                 *precedent=i;
                 *emplacement= *emplacement +1;
@@ -354,7 +359,6 @@ void deplacement(char tab[15][19], int *clef,int score_general, int* score, int 
                 (*clef)--;
                 tab[changement[*emplacement][1]][changement[*emplacement][0]]=tab[y][x];
                 tab[y][x]=*precedent-z;
-                (*score)+=1;
                 *precedent=0;
                 *emplacement= *emplacement +1;
 
@@ -387,9 +391,10 @@ int TEST_DIE( char tab[15][19],int clef, int lvl, int *score, int precedent, int
 
 //test de la condition de mort: entouré de cases a valeur négatives
     if (((tab[y+1][x]==-2)||(tab[y-1][x]==-2)||(tab[y][x+1]==-2)||(tab[y][x-1]==-2))&&(marteau)) return 0;
-    if ((((tab[y+1][x]<0)&&(tab[y-1][x]<0)&&(tab[y][x+1]<0)&&(tab[y][x-1]<0)&&(clef==0))||(((tab[y+1][x]<0)&&(tab[y-1][x]<0)
-    &&(tab[y][x+1]<0)&&(tab[y][x-1]<0))&&((tab[y+1][x]!=-50)&&((tab[y-1][x]!=-50)&&(tab[y][x+1]!=-50)&&(tab[y][x-1]!=-50))))
-    ||(precedent==66)))
+    if (((((tab[y+1][x]<0)||(y+1>14))&&((tab[y-1][x]<0)||(y-1)<0)&&((tab[y][x+1]<0)||(x+1>18))&&((tab[y][x-1]<0)||(x-1<0))&&(clef==0))||
+         ((((tab[y+1][x]<0)||(y+1>14))&&((tab[y-1][x]<0)||(y-1)<0)&&((tab[y][x+1]<0)||(x+1>18))&&((tab[y][x-1]<0)||(x-1<0)))&&
+          (((tab[y+1][x]!=-50)||(y+1>14))&&((tab[y-1][x]!=-50)||(y-1<0))&&((tab[y][x+1]!=-50)||(x+1>18))&&((tab[y][x-1]!=-50)||(x-1<0)))))
+    ||(precedent==66))
     {
         switch(afficher_mort(score, lvl,  mode_graphique))
         {

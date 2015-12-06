@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <stdarg.h>
+void afficher_menu();
+void saisie_nom(char imput[50]);
+void sauvegarde_score(char imput[50], int score);
 int menu_oui_non(BITMAP* buffer, char* mot);
 void fin_de_niveau(int niveau);
 void gotoligcol(int lig, int col);
@@ -12,7 +16,7 @@ void recherche_joueur(char valeurs[15][19], int* x, int*y);
 void recherche_sortie_et_ennemis(char tab[15][19], int* xsortie, int* ysortie, int* tunnel, int* nb_ennemis);
 int update_cases_glace(char tab[15][19]);
 int update_cases_eau(char tab[15][19]);
-void initialisation_console(char tab[15][19], char affiche_console[15][19], int score, int score_niveau);
+void initialisation_console(char affiche_console[15][19], int score, int score_niveau);
 void affichage_score(int* score, int score_niveau);
 void initialisation_niveau(FILE* fichier, char valeurs[15][19]);
 void deplacement(char tab[15][19], int *clef,int score_general, int* score, int *precedent, int changement[50][2], int* emplacement, int* potion, char affiche[15][19], int niveau, int* marteau);
