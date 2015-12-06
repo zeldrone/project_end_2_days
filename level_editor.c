@@ -1,35 +1,44 @@
-#include<allegro.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
-#include<string.h>
+
 #include "header.h"
 #include "header_allegro.h"
-#include <allegro.h>
-#define LIGNE text_height(font)
+/////////////////////////////////////////
+// nom: page_flip
+//utilité: gérer un affichage a deux images virtuelles
+//dernière modif: Baptiste, commentaire,06/12
+//entrées: le tableau d'affichage, le pointeur sur le numero de l'image utilisée
+////////////////////////////////////////
 void page_flip(BITMAP* affiche[15][19], int* page)
 {
+    //0 declaration de variables
     BITMAP* buffer1;
     BITMAP* buffer2;
-    scare_mouse();
+    scare_mouse(); // on cache la souris
     if(*page)
     {
-        buffer1= affiche_buffer(affiche);
-        blit(buffer1, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-        destroy_bitmap(buffer1);
-        *page=0;
+        buffer1= affiche_buffer(affiche); // on charge l'image demandée
+        blit(buffer1, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE); // on l'affiche
+        destroy_bitmap(buffer1); // on détruis la mémoire
+        *page=0; // on change la page
     }
     else
     {
+        // idem
         buffer2= affiche_buffer(affiche);
         blit(buffer2, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
         destroy_bitmap(buffer2);
         *page=1;
     }
-    unscare_mouse();
+    unscare_mouse(); // on réaffiche la souris
 }
+/////////////////////////////////////////
+// nom: ennemy_editor
+//utilité: définition des mouvements des ennemis par l'utilisateur
+//dernière modif: Baptiste, commentaire,06/12
+//entrées: le tableau d'affichage, le tableau de valeurs, le nom du niveau
+////////////////////////////////////////
 int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
 {
+    //0 declaration de variables
     int i,j,a=0;
     int nb_ennemi = 0;
     int deplacements_ennemis[50]= {0};
@@ -40,44 +49,45 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
     BITMAP* buffer;
     BITMAP* chemin;
     BITMAP* depart;
-    chemin = load_bitmap("passee.bmp", NULL);
-    depart = load_bitmap("case_depart.bmp", NULL);
-    init_mode_graphique(1, affiche2);
-    buffer=create_bitmap(TSPRITE*19,TSPRITE*15);
-    buffer=affiche_buffer(affiche);
     FILE* fichier=NULL;
+    //1 initialisations
+    chemin = load_bitmap("passee.bmp", NULL); // indicateur qu'une case fais partie du chemin passé par l'ennemi
+    depart = load_bitmap("case_depart.bmp", NULL); // indicateur de la case de départ
+    init_mode_graphique(1, affiche2); // chargement des images du jeu
+    buffer=create_bitmap(TSPRITE*19,TSPRITE*15);
+    buffer=affiche_buffer(affiche); // chargement du niveau tel qu'il a été dessiné
+    
     for (i=0; i<15; i++)
     {
         for(j=0; j<19; j++)
         {
-            if (tab[i][j]==66) nb_ennemi++;
+            if (tab[i][j]==66) nb_ennemi++; // Comptage des ennemis
         }
     }
     i=0;
     j=0;
-    int coord_ennemis[nb_ennemi][2];
+    int coord_ennemis[nb_ennemi][2]; // tableau des coordonnées de tous les ennemis
     for (i=0; i<15; i++)
     {
         for(j=0; j<19; j++)
         {
             if (tab[i][j]==66)
             {
-                coord_ennemis[a][0]=j;
+                coord_ennemis[a][0]=j; // enregistrement des différentes coordonnées
                 coord_ennemis[a++][1]=i;
             }
         }
     }
     for (i=0; i<nb_ennemi; i++)
     {
-        j=0;
         for(j=0; j<nb_ennemi; j++)
         {
-            affiche[coord_ennemis[j][1]][coord_ennemis[j][0]]=affiche2[7];
+            affiche[coord_ennemis[j][1]][coord_ennemis[j][0]]=affiche2[7]; // on cache tous les ennemis par de la glace
         }
 
-        if (strlen(niveau)<40)
+        if (strlen(niveau)<40) // si le nom permet de le supporter
         {
-            sprintf(buffert, "ennemi.%s.%d.txt", niveau, i);
+            sprintf(buffert, "ennemi.%s.%d.txt", niveau, i); //on ouvre le fichier de l'ennemi qui nous intéresse
             fopen(buffert, "w");
         }
         else
@@ -86,18 +96,18 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
             destroy_bitmap(buffer);
             destroy_bitmap(chemin);
             destroy_bitmap(depart);
-            return 0;
+            return 0; // échec de l'édition
         }
-        affiche[coord_ennemis[i][1]][coord_ennemis[i][0]]=affiche2[5];
-        buffer=affiche_buffer(affiche);
+        affiche[coord_ennemis[i][1]][coord_ennemis[i][0]]=affiche2[5]; // affichage de l'ennemi qui nous intéresse
+        buffer=affiche_buffer(affiche); // on recharge le niveau avec ces nouvelles valeurs
         a=1;
-        deplacements_ennemis[0]=49;
+        
         rest(100);
         while(!key[KEY_ENTER])
         {
             direction_x=0;
             direction_y=0;
-            if(a<49)
+            if(a<49) // le nombre max de déplacements
             {
                 if(!key[KEY_W])
                 {
@@ -112,19 +122,20 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
                                     destroy_bitmap(buffer);
                                     destroy_bitmap(chemin);
                                     destroy_bitmap(depart);
-                                    return 1;
+                                    return 1;// sortie immédiate
                                 }
                             }
                             else
                             {
-                                coord_ennemis[i][0]++;
-                                deplacements_ennemis[a++]=1;
-                                direction_x=1;
-                                rest(100);
+                                coord_ennemis[i][0]++; //incrément de la position de l'ennemi
+                                deplacements_ennemis[a++]=1; // incrément de a et obtention de la valeurs a inscrire dans le fichier texte
+                                direction_x=1; // sauvegarde de la direction
+                                rest(100); // pause pour ralentir les mouvements 
                             }
                         }
                         else
                         {
+                            // idem
                             coord_ennemis[i][0]--;
                             deplacements_ennemis[a++]=2;
                             direction_x=-1;
@@ -133,6 +144,7 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
                     }
                     else
                     {
+                        //idem
                         coord_ennemis[i][1]++;
                         deplacements_ennemis[a++]=3;
                         direction_y=1;
@@ -141,12 +153,13 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
                 }
                 else
                 {
+                    //idem
                     coord_ennemis[i][1]--;
                     deplacements_ennemis[a++]=4;
                     direction_y=-1;
                     rest(100);
                 }
-                if ((coord_ennemis[i][0]>=0)&&(coord_ennemis[i][1]>=0)&&(coord_ennemis[i][0]<19)&&(coord_ennemis[i][1]<15))
+                if ((coord_ennemis[i][0]>=0)&&(coord_ennemis[i][1]>=0)&&(coord_ennemis[i][0]<19)&&(coord_ennemis[i][1]<15)) //blindage de sortie de tableau
                 {
                     if ((chemin==NULL)||(depart==NULL)) printf("echec du chargement!");
                     if(a==2)draw_sprite(buffer, depart, TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
@@ -181,9 +194,9 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
             a=0;
             for(a=0; a<50; a++)
             {
-                fprintf(fichier, "%d ", deplacements_ennemis[a++]);
+                fprintf(fichier, "%d ", deplacements_ennemis[a]);
             }
-            allegro_message("mouvement enregistr�!");
+            allegro_message("mouvement enregistré!");
             fclose(fichier);
             break;
         case 2:
