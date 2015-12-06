@@ -1,3 +1,4 @@
+@@ -0,0 +1,630 @@
 #include<allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,9 +84,6 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
         else
         {
             allegro_message("le nom est trop long!");
-            destroy_bitmap(buffer);
-            destroy_bitmap(chemin);
-            destroy_bitmap(depart);
             return 0;
         }
         affiche[coord_ennemis[i][1]][coord_ennemis[i][0]]=affiche2[5];
@@ -107,13 +105,7 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
                         {
                             if(!key[KEY_D])
                             {
-                                if(key[KEY_ESC])
-                                {
-                                    destroy_bitmap(buffer);
-                                    destroy_bitmap(chemin);
-                                    destroy_bitmap(depart);
-                                    return 1;
-                                }
+                                if(key[KEY_ESC]) return 1;
                             }
                             else
                             {
@@ -148,15 +140,15 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
                 }
                 if ((coord_ennemis[i][0]>=0)&&(coord_ennemis[i][1]>=0)&&(coord_ennemis[i][0]<19)&&(coord_ennemis[i][1]<15))
                 {
-                    if ((chemin==NULL)||(depart==NULL)) printf("echec du chargement!");
-                    if(a==2)draw_sprite(buffer, depart, TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
-                    else if (a>2)
-                    {
-                        draw_sprite(buffer, affiche2[7], TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
-                        draw_sprite(buffer, chemin, TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
-                    }
-                    draw_sprite(buffer, affiche2[5], TSPRITE*coord_ennemis[i][0], TSPRITE*coord_ennemis[i][1]);
-                    blit(buffer, screen, 0,0,0,0, TSPRITE*19, TSPRITE*15);
+                if ((chemin==NULL)||(depart==NULL)) printf("echec du chargement!");
+                if(a==2)draw_sprite(buffer, depart, TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
+                else if (a>2)
+                {
+                    draw_sprite(buffer, affiche2[7], TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
+                    draw_sprite(buffer, chemin, TSPRITE*(coord_ennemis[i][0]-direction_x), TSPRITE*(coord_ennemis[i][1]-direction_y));
+                }
+                draw_sprite(buffer, affiche2[5], TSPRITE*coord_ennemis[i][0], TSPRITE*coord_ennemis[i][1]);
+                blit(buffer, screen, 0,0,0,0, TSPRITE*19, TSPRITE*15);
                 }
                 else
                 {
@@ -183,20 +175,14 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
             {
                 fprintf(fichier, "%d ", deplacements_ennemis[a++]);
             }
-            allegro_message("mouvement enregistré!");
+            allegro_message("mouvement enregistrï¿½!");
             fclose(fichier);
             break;
         case 2:
-            destroy_bitmap(buffer);
-            destroy_bitmap(chemin);
-            destroy_bitmap(depart);
             return 1;
         }
         buffer=affiche_buffer(affiche);
     }
-    destroy_bitmap(buffer);
-    destroy_bitmap(chemin);
-    destroy_bitmap(depart);
     return 0;
 }
 int sauvegarde_niveau(int valeurs[15][19], char mot[50])
@@ -280,7 +266,7 @@ int conversion(int num, int *compteur)
         break;
     case 13:
         num=9;
-        break;
+    break;
     case 14:
         num=101+((*compteur)%2)*10+(*compteur)-(*compteur)%2;
         (*compteur)++;
@@ -323,16 +309,9 @@ int menu_oui_non(BITMAP* buffer, char* mot)
             blit(buffer, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
             compteur=1;
         }
-        if (key[KEY_ESC])
-        {
-            destroy_bitmap(ecran_noir);
-            destroy_bitmap(sauvegarde);
-            return 2;
-        }
+        if (key[KEY_ESC]) return 2;
     }
     clear_keybuf();
-    destroy_bitmap(ecran_noir);
-    destroy_bitmap(sauvegarde);
     return compteur;
 }
 
@@ -380,12 +359,7 @@ int editeur_de_case(BITMAP* affiche[15][19], int valeurs[15][19])
             }
 
         }
-        if (key[KEY_ESC])
-        {
-            i=0;
-            for(i=0; i<NBSPRITE; i++) if(affiche2[i]!=NULL) destroy_bitmap(affiche2[i]);
-            return 1;
-        }
+        if (key[KEY_ESC]) return 1;
         if (key[KEY_ENTER])
         {
             compteur_joueur=0;
@@ -423,12 +397,7 @@ int editeur_de_case(BITMAP* affiche[15][19], int valeurs[15][19])
                 if (compteur_sortie>1) allegro_message("il y a plus d'un point de sortie!\n");
                 else if (compteur_joueur>1) allegro_message("il y a plus d'un joueur!");
                 else if(compteur_clef!=compteur_serrure) allegro_message("il n'y a pas le meme nombre de serrures que de clef!");
-                else
-                {
-                    i=0;
-                    for(i=0; i<NBSPRITE; i++) if(affiche2[i]!=NULL) destroy_bitmap(affiche2[i]);
-                    return 0;
-                }
+                else return 0;
             }
 
         }
@@ -446,8 +415,6 @@ int editeur_de_case(BITMAP* affiche[15][19], int valeurs[15][19])
             rest(100);
         }
     }
-    i=0;
-    for(i=0; i<NBSPRITE; i++) if(affiche2[i]!=NULL) destroy_bitmap(affiche2[i]);
     return 0;
 }
 int worst_writing_ever(char mot[50], BITMAP* buffer, BITMAP* ecran_noir, int line, BITMAP* affiche[15][19])
@@ -463,26 +430,25 @@ int worst_writing_ever(char mot[50], BITMAP* buffer, BITMAP* ecran_noir, int lin
     {
         if (key[KEY_ESC]) return 1;
         if (keypressed())
-        {
-            key_allegro=readkey();
-            key_ascii= key_allegro & 0xff;
+        {key_allegro=readkey();
+        key_ascii= key_allegro & 0xff;
 
-            if((key_ascii >= 32) && (key_ascii <= 126))
+        if((key_ascii >= 32) && (key_ascii <= 126))
+        {
+            if (i<49)
             {
-                if (i<49)
-                {
-                    mot[i]= key_ascii;
-                    for(a=0; a<i+1; a++)textprintf_ex(ecran_noir, font, a*text_length(font, "O"), line*LIGNE+5, makecol(255, 255, 255),-1, "%c", mot[a]);
-                    a=0;
-                    destroy_bitmap(buffer);
-                    buffer=affiche_buffer(affiche);
-                    draw_sprite(buffer, ecran_noir, 192-2*32, 160);
-                    blit(buffer, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-                    mot[i+1]='\0';
-                    i++;
-                }
+                mot[i]= key_ascii;
+                for(a=0; a<i+1; a++)textprintf_ex(ecran_noir, font, a*text_length(font, "O"), line*LIGNE+5, makecol(255, 255, 255),-1, "%c", mot[a]);
+                a=0;
+                destroy_bitmap(buffer);
+                buffer=affiche_buffer(affiche);
+                draw_sprite(buffer, ecran_noir, 192-2*32, 160);
+                blit(buffer, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+                mot[i+1]='\0';
+                i++;
             }
         }
+    }
     }
 
     mot[i]='\0';
@@ -516,7 +482,7 @@ void level_editor()
     install_mouse();
     enable_hardware_cursor();
     install_timer();
-    BITMAP* affiche[15][19];
+    BITMAP* affiche[15][19]= {{load_bitmap("mur.bmp", NULL)}};
     ecran_noir= create_bitmap(192+5*32, 160);
     clear_to_color(ecran_noir, makecol(0, 0, 0));
     buffer= create_bitmap(TSPRITE*19, TSPRITE*15);
@@ -538,10 +504,8 @@ void level_editor()
         menu(buffer, affiche, mot);
         destroy_bitmap(buffer);
         destroy_bitmap(ecran_noir);
-        clear_bitmap(screen);
-        set_gfx_mode(GFX_TEXT,80,25,0,0);
         allegro_exit();
-    }
+        }
 }
 int menu(BITMAP* buffer, BITMAP* affiche[15][19], char mot[50])
 {
@@ -605,10 +569,10 @@ int menu(BITMAP* buffer, BITMAP* affiche[15][19], char mot[50])
                 rest(300);
                 while(!key[KEY_ENTER]) if (key[KEY_ESC])
                     {
-                        destroy_bitmap(ecran_noir);
-                        destroy_bitmap(ecran_selec);
-                        return 0;
-                    }
+                destroy_bitmap(ecran_noir);
+                destroy_bitmap(ecran_selec);
+                return 0;
+                }
             }
         }
         else
@@ -664,4 +628,3 @@ int menu(BITMAP* buffer, BITMAP* affiche[15][19], char mot[50])
     }
     return 0;
 }
-
