@@ -1,4 +1,3 @@
-@@ -0,0 +1,630 @@
 #include<allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
