@@ -2,23 +2,146 @@
 #include <winalleg.h>
 #include "header_allegro.h"
 #include "header.h"
+///////////////////////////////////////////////////////////////////////
+// Nom: afficher_intro
+// utilité: affiche l'introduction du turotiel en mode graphique
+// nombre de modifications: 2
+// dernière modification: Baptiste, commentaire, 06/12
+// entrées et sortie: la case sur laquelle le joueur est, le pointeur de potion, la direction du joueur,
+// les tableaux de valeurs et d'affichage, les coordonées de la case suivante, le mode graphique et les scores
+// sortie: la case par-dessus laquelle le joueur est après son déplacement
+////////////////////////////////////////////////////////////////////////
+int objets_graphique(int buffer, int* potion, int direction_x, int direction_y,BITMAP* affiche[15][19], char tab[15][19], int coord_case_suiv[2],int mode_graphique, int score_general, int* score, BITMAP* affiche2[NBSPRITE])
+{
+    //0 déclaration des variables
+    int buffer1=0, buffer2; 
+    switch (buffer)
+        {
 
+        case 4:
+            // On incrémente le compteur de potion
+            *potion= *potion+6;
+            return 0;
+            break;
+        case 5:
+            // le rocher se déplace vers là où il est poussé jusqu'à ce qu'il rencontre un mur
+            coord_case_suiv[0]+= direction_x;
+            coord_case_suiv[1]+= direction_y;
+            // récupération du sens de déplacement
+            while(tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]>=0) //tant que la case suivante est positive
+            {
+                tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]=tab[coord_case_suiv[1]][coord_case_suiv[0]];
+                
+                tab[coord_case_suiv[1]][coord_case_suiv[0]]=-1;
+                // on met de l'eau a la place du rocher
+                coord_case_suiv[0]+= direction_x;
+                coord_case_suiv[1]+= direction_y;
+                // on récupère la case suivante
+                tab[coord_case_suiv[1]][coord_case_suiv[0]]=5;
+                // on place le rocher
+                update_affichage_graphique(tab, affiche, affiche2, mode_graphique);
+                affichage_graphique(affiche, mode_graphique, score_general, *score, affiche2, tab);
+                // on affiche les changements
+                rest(50);
+                // on pause pour ralentir le mouvement
+            }
+            tab[coord_case_suiv[1]][coord_case_suiv[0]]=-1;
+            //le rocher laisse sa place a de l'eau
+            return 0;
+            break;
+
+        case 8:
+            // Le turbo, découvert par erreur en codant le rocher, projète le joueur contre le mur dans la direction qu'il a pris
+            while(tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]>=0) //tant que la case suivante est positive
+            {
+                buffer2=tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]; //on sauvegarde la case suivante
+                tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]=tab[coord_case_suiv[1]][coord_case_suiv[0]];
+                //on fait avancer le joueur
+                tab[coord_case_suiv[1]][coord_case_suiv[0]]=buffer1;
+                // on remet la case précédente
+                buffer1=buffer2;
+                // on retiens la valeur de la case sauvegardée
+                coord_case_suiv[0]+= direction_x;
+                coord_case_suiv[1]+= direction_y;
+                // on obtiens les coordonées de la case suivante
+                tab[coord_case_suiv[1]][coord_case_suiv[0]]=2;
+                // on met le personnage sur la case suivante
+                update_affichage_graphique(tab, affiche, affiche2, mode_graphique);
+                affichage_graphique(affiche, mode_graphique, score_general, *score, affiche2, tab);
+                // on affiche
+                rest(50);
+                // on pause pour ralentir le mouvement
+            }
+            return 0;
+            // on met la case précédente a "glace"
+            break;
+            case 100: // si c'est une clé
+              (*clef)++;
+              // incrément du nombre de clefs
+               return 0;
+               // la case précédente deviens de la glace
+        }
+        if (buffer>100)
+        {
+            // si c'est un téléporteur
+            i=0;
+            j=0;
+            for(i=0; i<15; i++)
+            {
+                for(j=0; j<19; j++)
+                {
+        
+                    if ((tab[i][j]==buffer+10)||(tab[i][j]==buffer-10)) // on cherche le teleporteur de sortie
+                    {
+                        tab[i][j]=2;
+                        tab[coord_case_suiv[1]][coord_case_suiv[0]]=-1;
+                        // on déplace le joueur et on détruis le téléporteur précédent
+                        return 0;
+                        // on met la case précédente a "glace"
+                    }
+                }
+            }
+        }
+    return buffer;
+    // on retourne la valeur de sauvegarde
+}
+///////////////////////////////////////////////////////////////////////
+// Nom: afficher_intro
+// utilité: affiche l'introduction du turotiel en mode graphique
+// nombre de modifications: 2
+// dernière modification: Baptiste, commentaire, 06/12
+// entrées et sortie: aucune;
+//////////////////////////////////////////////////////////////////////
 void afficher_intro()
 {
+    // 0 declaration de variables
     BITMAP* buffer;
+    //1 initialisation
     buffer=create_bitmap(19*TSPRITE, 15*TSPRITE);
     clear_bitmap(buffer);
+    //1 ecriture sur buffer et affichage
     textprintf_ex (buffer, font, 152, 170+ 0*(LIGNE+3), makecol(255, 255, 255),-1,"Bienvenue dans le tutoriel!");
     textprintf_ex (buffer, font, 152, 170+ 1*(LIGNE+3), makecol(255, 255, 255),-1,"Pendant le jeu appuyez sur h pour acceder aux regles");
     blit(buffer, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
     while(!key[KEY_ENTER]);
 }
+///////////////////////////////////////////////////////////////////////
+// Nom: afficher_menu_graphique
+// utilité: affiche les regles en mode graphique
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 2
+// entrées et sortie: aucune;
+///////////////////////////////////////////////////////////////////////
+
 void afficher_menu_graphique()
 {
+    //0 declaration de variables
     BITMAP* buffer;
     int a=1;
+    //1 initialisation
     buffer=create_bitmap(19*TSPRITE, 15*TSPRITE);
     clear_bitmap(buffer);
+    //2 ecriture sur buffer et affichage
     textprintf_ex (buffer, font, 0, 170+ a++*(LIGNE+3), makecol(255, 255, 255),-1,"Regles :");
     textprintf_ex (buffer, font, 0, 170+ a++*(LIGNE+3), makecol(255, 255, 255),-1," pour vous deplacer utilisez touches z,q,s,d");
     textprintf_ex (buffer, font, 0, 170+ a++*(LIGNE+3), makecol(255, 255, 255),-1," Lorsque vous passez sur un bloc de glace, il disparait.");
@@ -35,8 +158,16 @@ void afficher_menu_graphique()
     textprintf_ex (buffer, font, 0, 170+ a++*(LIGNE+3), makecol(255, 255, 255),-1," Attention a ne pas detruire de clef!");
     textprintf_ex (buffer, font, 0, 170+ a++*(LIGNE+3), makecol(255, 255, 255),-1," Amusez-vous !");
     blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+    // libération de mémoire
     destroy_bitmap(buffer);
 }
+///////////////////////////////////////////////////////////////////////
+// Nom: afficher_menu
+// utilité: affiche les regles
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 2
+// entrées et sortie: aucune;
+///////////////////////////////////////////////////////////////////////
 void afficher_menu()
 {
     system("cls");
@@ -58,6 +189,13 @@ void afficher_menu()
     printf (" Des clef %c seront disponibles pour les ouvrir et terminer le niveau.\n", 197);
     printf (" Amusez-vous!\n");
 }
+///////////////////////////////////////////////////////////////////////
+// Nom: fin_de_niveau
+// utilité: termine le jeu et enregistre le niveau auquel le jouer s'arrête
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 3
+// entrées et sortie: aucune;
+///////////////////////////////////////////////////////////////////////
 void fin_de_niveau(int niveau)
 {
     FILE* sauvegarde;
@@ -66,180 +204,129 @@ void fin_de_niveau(int niveau)
     fclose(sauvegarde);
     exit(0);
 }
+///////////////////////////////////////////////////////////////////////
+// Nom: deplacement_graphique
+// utilité: gère le déplacement de l'ennemi
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 8
+// entrées: le tableau de valeurs, le pointeurs de score
+// sortie: rien
+///////////////////////////////////////////////////////////////////////
 int deplacement_graphique(char tab[15][19], int* score, int* clef, int precedent, int* potion, BITMAP* affiche[15][19], BITMAP* affiche2[NBSPRITE], int mode_graphique, int score_general, int niveau, int* marteau)
 {
-
+    // 0 declaration des variables et blindages de touches appuyées en trop
     clear_keybuf();
     int i,j,x,y;
     int z=1;
     int direction_x=0, direction_y=0;
     int test=1, buffer=precedent, buffer1=-1, buffer2;
     int coord_case_suiv[2]= {0};
-    for(i=0; i<15; i++)
-    {
-        for(j=0; j<19; j++)
-        {
-            if (tab[i][j]==2)
-            {
-                x=j;
-                y=i;
-            }
-        }
-    }
-    i=0;
-    j=0;
+    recherche_joueur(tab,&x,&y);
     if(!key[KEY_W])
     {
         if(!key[KEY_S])
         {
-            if(!key[KEY_A]) //allegro g�re le clavier en qwerty
+            if(!key[KEY_A]) //allegro gère le clavier en qwerty z=w et a=q
             {
                 if(!key[KEY_D])
                 {
-                    if(!key[KEY_X]) test=0;
-                    else fin_de_niveau(niveau);
+                    if(!key[KEY_X]) test=0; //pas de touche
+                    else fin_de_niveau(niveau); // si l'utilisateur tape X le jeu sors
                 }
                 else
                 {
+                    // on récupère les coordonnées de la case sur laquelle le joueur souhaite aller
                     coord_case_suiv[0]=x+1;
                     coord_case_suiv[1]=y;
+                    // on récupère sa direction
                     direction_x=1;
                 }
             }
             else
             {
+                // idem
                 coord_case_suiv[0]=x-1;
                 coord_case_suiv[1]=y;
+                // idem
                 direction_x=-1;
             }
         }
         else
         {
+            // idem
             coord_case_suiv[0]=x;
             coord_case_suiv[1]=y+1;
+            //idem
             direction_y=1;
         }
     }
     else
     {
+        //idem
         coord_case_suiv[0]=x;
         coord_case_suiv[1]=y-1;
+        //idem
         direction_y=-1;
     }
-    if ((coord_case_suiv[0]>=0)&&(coord_case_suiv[0]<19)&&(coord_case_suiv[1]>=0)&&(coord_case_suiv[1]<15)&&(test))
+    if ((coord_case_suiv[0]>=0)&&(coord_case_suiv[0]<19)&&(coord_case_suiv[1]>=0)&&(coord_case_suiv[1]<15)&&(test))//test des conditions autorisées pour un potentiel déplacement
     {
-        if(*potion>0)
+        if(*potion>0) //si la potion est active
         {
+            // on décrémente la potion
             *potion=*potion-1;
+            // on interdit la décrémentation de la case quittée
             z=0;
+            
         }
-        if ((tab[coord_case_suiv[1]][coord_case_suiv[0]]>=0)||((tab[coord_case_suiv[1]][coord_case_suiv[0]]==-2)&&(*marteau)))
+        if ((tab[coord_case_suiv[1]][coord_case_suiv[0]]>=0)||((tab[coord_case_suiv[1]][coord_case_suiv[0]]==-2)&&(*marteau)))// test des conditions autorisées pour un déplacement effectif
         {
             buffer=tab[coord_case_suiv[1]][coord_case_suiv[0]];
+            // on enregistre la case sur laquelle le personnage va
             tab[coord_case_suiv[1]][coord_case_suiv[0]]=tab[y][x];
+            // on déplace le personnage
             tab[y][x]=precedent-z;
-            (*score)+=z;
+            // on rétabli la case par-dessus laquelle le personnage était en enlevant 1 si la potions est inactive
         }
-        if (buffer==100)
-        {
-            (*clef)++;
-            return 0;
-        }
-        if((tab[coord_case_suiv[1]][coord_case_suiv[0]]==-50)&&(*clef>0))
+        
+        if((tab[coord_case_suiv[1]][coord_case_suiv[0]]==-50)&&(*clef>0)) // si c'est une serrure et qu'on a une clef
         {
             (*clef)--;
+            // on décrémente la clef
             tab[coord_case_suiv[1]][coord_case_suiv[0]]=tab[y][x];
+            // on avance sur la case
             tab[y][x]=precedent-z;
-            (*score)+=z;
+            // on remet en place la case
             return 0;
+            // on enregisre la case en-dessous du joueur comme glace
         }
-        switch (buffer)
-        {
-
-        case 4:
-            *potion= *potion+6;
-            return 0;
-            break;
-        case 5:
-            coord_case_suiv[0]+= direction_x;
-            coord_case_suiv[1]+= direction_y;
-            while(tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]>=0)
-            {
-                tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]=tab[coord_case_suiv[1]][coord_case_suiv[0]];
-                // on met de l'eau a la place du rocher
-                tab[coord_case_suiv[1]][coord_case_suiv[0]]=-1;
-                coord_case_suiv[0]+= direction_x;
-                coord_case_suiv[1]+= direction_y;
-                update_affichage_graphique(tab, affiche, affiche2, mode_graphique);
-                affichage_graphique(affiche, mode_graphique, score_general, *score, affiche2, tab);
-                tab[coord_case_suiv[1]][coord_case_suiv[0]]=5;
-                rest(50);
-            }
-            tab[coord_case_suiv[1]][coord_case_suiv[0]]=-1;
-            return 0;
-            break;
-
-        case 8:
-            while(tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]>=0)
-            {
-                buffer2=tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x];
-                tab[coord_case_suiv[1]+direction_y][coord_case_suiv[0]+direction_x]=tab[coord_case_suiv[1]][coord_case_suiv[0]];
-                // on met de l'eau a la place du rocher
-                tab[coord_case_suiv[1]][coord_case_suiv[0]]=buffer1;
-                buffer1=buffer2;
-                coord_case_suiv[0]+= direction_x;
-                coord_case_suiv[1]+= direction_y;
-                update_affichage_graphique(tab, affiche, affiche2, mode_graphique);
-                affichage_graphique(affiche, mode_graphique, score_general, *score, affiche2, tab);
-                tab[coord_case_suiv[1]][coord_case_suiv[0]]=2;
-                rest(50);
-            }
-            return 0;
-            break;
-        case 9:
-            (*marteau)+=6;
-            return 0;
-            break;
-        case -2:
-            (*marteau)--;
-            return 0;
-            break;
-        }
-        if (buffer>100)
-        {
-            i=0;
-            j=0;
-            for(i=0; i<15; i++)
-            {
-                for(j=0; j<19; j++)
-                {
-
-                    if ((tab[i][j]==buffer+10)||(tab[i][j]==buffer-10))
-                    {
-                        tab[i][j]=2;
-                        tab[coord_case_suiv[1]][coord_case_suiv[0]]=-1;
-                        return 0;
-                    }
-                }
-            }
-        }
-
-        return buffer;
+        // on appelle le test des objets
+        return objets_graphique(buffer, potion,direction_x,direction_y,affiche, tab, coord_case_suiv,mode_graphique, score_general, score,affiche2)
     }
+    // si aucune actio la case précédente reste la même
     else return precedent;
 }
-
+///////////////////////////////////////////////////////////////////////
+// Nom: affichage_graphique
+// utilité: gère l'affichage graphique
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 3
+// entrées: le tableau d'affichage, le mode graphique, le score général et celui du niveau,
+// le tableau des différentes images, le tableau de valeurs
+// sortie: rien;
+///////////////////////////////////////////////////////////////////////
 void affichage_graphique(BITMAP* affiche[15][19], int mode_graphique, int score, int score_niveau, BITMAP* affiche2[NBSPRITE], char tab[15][19])
 {
+    //0 declaration de variables
     int i,j;
     BITMAP* buffer;
     BITMAP* fond;
 
-    buffer= create_bitmap(19*TSPRITE, 15*TSPRITE);
-    if (mode_graphique==2)
+    buffer= create_bitmap(19*TSPRITE, 15*TSPRITE);// image de la taille de l'écran
+    if (mode_graphique==2) // si mode star_wars
     {
         fond=load_bitmap("fond_star_wars.bmp", NULL);
         draw_sprite(buffer, fond,0,0);
+        // le fond deviens l'image de fond de star Wars
         destroy_bitmap(fond);
     }
 
@@ -247,18 +334,26 @@ void affichage_graphique(BITMAP* affiche[15][19], int mode_graphique, int score,
     {
         for(j=0; j<19; j++)
         {
-            if (affiche[i][j]!=NULL) draw_sprite(buffer, affiche[i][j], j*TSPRITE, i*TSPRITE);
+            if (affiche[i][j]!=NULL) draw_sprite(buffer, affiche[i][j], j*TSPRITE, i*TSPRITE); //dessin du niveau sur le buffer
         }
     }
     textprintf_ex(buffer, font, 15*TSPRITE-20, 7, makecol(255, 0,0),-1, "Score: %d", score);
     textprintf_ex(buffer, font, 15*TSPRITE-20, 10+LIGNE, makecol(255, 0,0),-1, "Score niveau: %d", score_niveau);
-    blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE);
+    // affichage des scores
+    blit(buffer, screen, 0,0,0,0, 19*TSPRITE, 15*TSPRITE); // copie sur l'écran
     destroy_bitmap(buffer);
 }
-
+///////////////////////////////////////////////////////////////////////
+// Nom: init_mode_graphique
+// utilité: charge les images
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 4
+// entrées: le mode graphique, le tableau des différentes images
+// sortie: rien;
+///////////////////////////////////////////////////////////////////////
 void init_mode_graphique(int mode_graphique,BITMAP* affiche2[NBSPRITE])
 {
-
+    // chargement des différents bitmaps
     switch(mode_graphique)
     {
     case 1:
@@ -297,13 +392,14 @@ void init_mode_graphique(int mode_graphique,BITMAP* affiche2[NBSPRITE])
         // le marteau
         break;
     case 2:
+        // idem avec les images star_wars
         affiche2[0]=load_bitmap("Bmp/Darth-Vader.bmp", NULL);
         affiche2[1]=NULL;
         affiche2[2]=load_bitmap("Bmp/master_yoda.bmp", NULL);
         affiche2[3]=load_bitmap("Bmp/sabre_laser18.bmp", NULL);
         affiche2[4]=load_bitmap("Bmp/star_wars_double.bmp", NULL);
         affiche2[5]=load_bitmap("Bmp/X-wing.bmp", NULL);
-        affiche2[6]=load_bitmap("Bmp/Space.bmp", NULL);
+        affiche2[6]=NULL;
         affiche2[7]=load_bitmap("Bmp/star_wars_floor.bmp", NULL);
         affiche2[8]=load_bitmap("Bmp/Death_Star.bmp", NULL);
         affiche2[9]=load_bitmap("Bmp/deathstar_fire1.bmp", NULL);
@@ -312,8 +408,15 @@ void init_mode_graphique(int mode_graphique,BITMAP* affiche2[NBSPRITE])
         break;
     }
 }
-
-void update_affichage_graphique(char tab[15][19], BITMAP* affiche[15][19], BITMAP* affiche2[NBSPRITE], int mode_graphique)
+///////////////////////////////////////////////////////////////////////
+// Nom: update_affichage_graphique
+// utilité: gère l'affichage graphique
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 5
+// entrées: le tableau de valeurs,le tableau d'affichage, le tableau des différentes images
+// sortie: rien;
+///////////////////////////////////////////////////////////////////////
+void update_affichage_graphique(char tab[15][19], BITMAP* affiche[15][19], BITMAP* affiche2[NBSPRITE])
 {
     int i,j, k,l;
     int teleport=0;
@@ -364,12 +467,14 @@ void update_affichage_graphique(char tab[15][19], BITMAP* affiche[15][19], BITMA
                 break;
             case 8:
                 affiche[i][j]= affiche2[12];
+                // le turbo
                 break;
             case 9:
                 affiche[i][j]= affiche2[13];
+                // le marteau
             }
             if (tab[i][j]>100)
-            {
+            {// les téléporteurs
                 for(k=0; k<15; k++)
                 {
                     for(l=0; l<19; l++)
@@ -388,19 +493,27 @@ void update_affichage_graphique(char tab[15][19], BITMAP* affiche[15][19], BITMA
         }
     }
 }
-
+///////////////////////////////////////////////////////////////////////
+// Nom: affichage_graphique
+// utilité: gère l'affichage graphique
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 8
+// entrées: le tableau de valeurs, le nombre d'ennemis, les coordonées des ennemis, le niveau, les compteurs des ennemis, le nombre de mouvements de chaque ennemis, l'hypothétique nom du niveau
+// sortie: rien;
+///////////////////////////////////////////////////////////////////////
 void init_move_ennemis(char tab[15][19], int nb_ennemis, int coord_ennemis[nb_ennemis][2], FILE* ennemis[nb_ennemis], int niveau, int compteurs_ennemis[nb_ennemis], int compteur_max[nb_ennemis], int precedent_ennemi[nb_ennemis], char mot[50])
 {
+    //0 déclaration des variables
     int i,j, a=0;
     char nom[30];
-    for(i=0; i<nb_ennemis; i++)
+    for(i=0; i<nb_ennemis; i++) //pour chaque ennemi
     {
-        if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")))sprintf(nom, "ennemi.%s.%d.txt",mot, i);
-        else sprintf(nom, "ennemi.niveau%d.%d.txt", niveau+1, i+1);
-        ennemis[i]=fopen(nom, "r");
-        compteurs_ennemis[i]=1;
-        precedent_ennemi[i]=0;
-        fscanf(ennemis[i], "%d", &compteur_max[i]);
+        if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")))sprintf(nom, "ennemi.%s.%d.txt",mot, i); //génération du nom du fichier ennemi si le niveau est un niveau non régulier
+        else sprintf(nom, "ennemi.niveau%d.%d.txt", niveau+1, i+1); // génération du nom de fichier pour les ennemis des niveaux réguliers
+        ennemis[i]=fopen(nom, "r");//ouverture du fichier
+        compteurs_ennemis[i]=1; // initialisation des compteur
+        precedent_ennemi[i]=0; // la case de départ d'un ennemi, toujours de la glace
+        fscanf(ennemis[i], "%d", &compteur_max[i]); // on lis le nombre de mouvements dans un cycle.
     }
     i=0;
     for(i=0; i<15; i++)
@@ -409,6 +522,7 @@ void init_move_ennemis(char tab[15][19], int nb_ennemis, int coord_ennemis[nb_en
         {
             if (tab[i][j]==66)
             {
+                //on récupère toutes les coordonnées des ennemis et on les stock
                 coord_ennemis[a][0]=j;
                 coord_ennemis[a][1]=i;
                 a++;
@@ -416,56 +530,66 @@ void init_move_ennemis(char tab[15][19], int nb_ennemis, int coord_ennemis[nb_en
         }
     }
 }
-
+///////////////////////////////////////////////////////////////////////
+// Nom: move_ennemis
+// utilité: gère le déplacement des ennemis
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 10
+// entrées: le fichier de l'ennemi, le tableau de valeurs, la case par-dessus laquelle est l'ennemi,son compteur de mouvement, ses coordonnées, le tableau de changements, le compteur de changements
+// sorties: rien;
+///////////////////////////////////////////////////////////////////////
 int move_ennemis(FILE* ennemis, char tab[15][19], int precedent_ennemi, int coord[2], int compteur, int changement[50][2], int* emplacement )
 {
+    //0 déclaration de variables
     int move;
     int direction_x=0, direction_y=0;
-    if(ennemis!=NULL)
+    if(ennemis!=NULL)// blindage
     {
-        fseek(ennemis, 2*compteur, SEEK_SET);
-        fscanf(ennemis, "%d", &move);
+        fseek(ennemis, 2*compteur, SEEK_SET); // on cherche le compteur-ième mouvement de l'ennemi
+        fscanf(ennemis, "%d", &move);// on le range dans move
     }
     switch(move)
     {
-    case 1:
+    case 1: //a droite
         direction_x=1;
         break;
-    case 2:
+    case 2: // a gauche
         direction_x=-1;
         break;
-    case 3:
+    case 3: // en bas
         direction_y=1;
         break;
-    case 4:
+    case 4: // en haut
         direction_y=-1;
         break;
     }
-    move= tab[coord[1]+direction_y][coord[0]+direction_x];
-
-    tab[coord[1]+direction_y][coord[0]+direction_x]= tab[coord[1]][coord[0]];
-    tab[coord[1]][coord[0]]= precedent_ennemi;
-    changement[*emplacement][0]=coord[0];
+    move= tab[coord[1]+direction_y][coord[0]+direction_x]; // on enregistre la case suivante par-dessus laquelle l'ennemi va
+    tab[coord[1]+direction_y][coord[0]+direction_x]= tab[coord[1]][coord[0]]; // on met l'ennemi a ses nouvelles coordonnées
+    tab[coord[1]][coord[0]]= precedent_ennemi; // on remet la case que l'ennemi quitte a sa valeur
+    changement[*emplacement][0]=coord[0]; // on enregistre que la case où etais l'ennemi a été modifiée pour la réafficher ultérieurement
     changement[(*emplacement)++][1]=coord[1];
-    coord[1]+= direction_y;
+    coord[1]+= direction_y; // on enregistre les nouvelles coordonnéesde l'ennemi
     coord[0]+=direction_x;
-    changement[*emplacement][0]=coord[0];
+    changement[*emplacement][0]=coord[0]; // on enregistre que la case où est l'ennemi a changée pour la réafficher ultérieurement
     changement[(*emplacement)++][1]=coord[1];
-    return move;
+    return move; // on retourne la case par-dessus laquelle l'ennemi est
 }
+///////////////////////////////////////////////////////////////////////
+// Nom: jeu_graphique
+// utilité: gère le jeu
+// dernière modification: Baptiste, commentaire, 06/12
+// nombre de modifications: 25
+// entrées: le niveau, un pointeur sur le score général, potentiellement le nom du niveau
+// sorties: un statut d'exécution (recommencer niveau, interrompre, execution normale)
+///////////////////////////////////////////////////////////////////////
 int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
 {
+    //0 déclaration de variables
     BITMAP* affiche[15][19];
     BITMAP* affiche2[NBSPRITE]= {NULL};
     FILE *niveau_rec;
     FILE *fichier[6]= {NULL};
 
-    fichier[0] = fopen("niveau1.txt","r");
-    fichier[1] = fopen("niveau2.txt","r");
-    fichier[2] = fopen("niveau3.txt","r");
-    fichier[3] = fopen("niveau4.txt","r");
-    fichier[4] = fopen("niveau5.txt","r");
-    fichier[5] = fopen("niveausauvegarde.txt","r");
     time_t debut;
     time_t mesure;
     int precedent=0;
@@ -484,6 +608,14 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
     int marteau=0;
     int POS_ECRAN_Y=0;
     int POS_ECRAN_X=0;
+    //1 initialisation
+    fichier[0] = fopen("niveau1.txt","r");
+    fichier[1] = fopen("niveau2.txt","r");
+    fichier[2] = fopen("niveau3.txt","r");
+    fichier[3] = fopen("niveau4.txt","r");
+    fichier[4] = fopen("niveau5.txt","r");
+    fichier[5] = fopen("niveausauvegarde.txt","r");
+    
     getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
     if (niveau==5)
     {
@@ -494,97 +626,103 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
     i=0;
     system("cls");
 
-    if (fichier[niveau]!=NULL) initialisation_niveau(fichier[niveau], valeurs);
+    if (fichier[niveau]!=NULL) initialisation_niveau(fichier[niveau], valeurs); //initialisation du tableau de valeurs
 
     if ((mot!= NULL)&&(strcmp(mot, "tutoriel")))
     {
-
+        // si le niveau demandé est un niveau spécial
         niveau_rec= fopen(mot, "r");
-        intitialisation_rec(niveau_rec, valeurs);
+        intitialisation_rec(niveau_rec, valeurs); //méthode d'initialisation spécifique aux niveaux enregistrés
 
     }
     if (mot!=NULL)
     {
         if (strcmp(mot, "tutoriel.txt")==0)
         {
+            // si le niveau demandé est le tutoriel
             fichier[niveau]= fopen(mot, "r");
-            if (fichier[niveau]!=NULL)initialisation_niveau(fichier[niveau], valeurs);
+            if (fichier[niveau]!=NULL)initialisation_niveau(fichier[niveau], valeurs); //initialisation classique
 
         }
     }
-    if (mode_graphique!=0)
+    if (mode_graphique) // mode graphique
     {
-        init_mode_graphique(mode_graphique, affiche2);
-        update_affichage_graphique(valeurs, affiche, affiche2, mode_graphique);
+        init_mode_graphique(mode_graphique, affiche2); // chargement des images
+        update_affichage_graphique(valeurs, affiche, affiche2); //rafraichissement du tableau d'affichage graphique
         if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")==0))
         {
-            afficher_intro();
+            afficher_intro();// affiche l'introduction du tutoriel
         }
 
     }
-    else
+    else // mode console
     {
-        update_tab_affiche(valeurs, affiche_console);
-        initialisation_console(affiche_console, *score, 0);
-        if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")==0))
+        update_tab_affiche(valeurs, affiche_console);// rafraichissement du tableau d'affichage console
+        initialisation_console(affiche_console, *score, 0); // affichage du tableau complet
+        if ((mot!=NULL)&&(strcmp(mot, "tutoriel.txt")==0)) // affichage de l'intro du tutoriel
         {
             gotoligcol(POS_ECRAN_Y/2,POS_ECRAN_X/3);
             printf("Bienvenue dans le niveau tutoriel!");
             gotoligcol(1+POS_ECRAN_Y/2,POS_ECRAN_X/3);
-            printf("En jeu maintenez h pour voir l'aide!");
+            printf("En jeu appuyez sur h pour voir l'aide!");
             Sleep(1500);
         }
     }
 
 
-    time(&debut);
-    recherche_sortie_et_ennemis(valeurs, &xsortie, &ysortie, &tunnel, &nb_ennemis);
-    recherche_joueur(valeurs, &x, &y);
-    nb_cases_glace= update_cases_glace(valeurs);
+    time(&debut); // on note l'heure de début du niveau
+    recherche_sortie_et_ennemis(valeurs, &xsortie, &ysortie, &tunnel, &nb_ennemis); // on compte les ennemis et on retient les coordonnées de la sorite/tunnel
+    recherche_joueur(valeurs, &x, &y); // on retient les coordonnées du joueur
+    nb_cases_glace= update_cases_glace(valeurs);// on compte le nombre de cases sur lesquelles le joueur peut et doit passer
     i=0;
+    // déclaration des variables relatives aux ennemis (nombre variable)
     int coord_ennemis[nb_ennemis][2];
     FILE* ennemis[nb_ennemis];
     int compteurs_ennemis[nb_ennemis];
     int compteur_max[nb_ennemis];
     int precedent_ennemi[nb_ennemis];
     int compteur=0;
-    init_move_ennemis(valeurs, nb_ennemis, coord_ennemis, ennemis, niveau, compteurs_ennemis, compteur_max, precedent_ennemi, mot);
-    while(boucle)
+    init_move_ennemis(valeurs, nb_ennemis, coord_ennemis, ennemis, niveau, compteurs_ennemis, compteur_max, precedent_ennemi, mot); //initialisation de toutes les valeurs des variables spécifiques aux ennemis
+    while(boucle) // boucle plus générale permettant la gestion du tunnel
     {
-        while(((x!=xsortie)||(y!=ysortie))||(nb_cases_eau!=nb_cases_glace))
+        while(((x!=xsortie)||(y!=ysortie))||(nb_cases_eau!=nb_cases_glace)) //test des conditions de fin du niveau
         {
 
             emplacement=POS_ECRAN_X;
-            getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
+            getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y); // récupération de la position du jeu a l'écran
             if (emplacement!= POS_ECRAN_X)
             {
                 system("cls");
-                initialisation_console(affiche_console,*score, score_niveau);
+                initialisation_console(affiche_console,*score, score_niveau); // en cas de changement de position du jeu (consome-> plein écran ou inverse) réaffichage de tout le tableau
             }
+            // remise a 0 des compteurs
             emplacement=0;
             i=0;
             nb_cases_eau=0;
             if (mode_graphique!=0)
             {
+                // déplacement en mode graphique et retenue du la variable precedent
                 precedent=deplacement_graphique(valeurs, &score_niveau, &cle, precedent, &potion, affiche, affiche2, mode_graphique, *score, niveau, &marteau);
             }
             else
             {
+                // deplacement en mode console
                 deplacement(valeurs, &cle,*score, &score_niveau, &precedent, changement, &emplacement, &potion, affiche_console, niveau, &marteau);
             }
 
-
-            if (compteur==5)
+            if (compteur==5) // les ennemis ne bougent qu'un tour de boucle sur 5
             {
-
+                // pour chaque ennemi
                 for(i=0; i<nb_ennemis; i++)
                 {
+                    // deplacement de l'ennemi
                     precedent_ennemi[i]=move_ennemis(ennemis[i], valeurs, precedent_ennemi[i], coord_ennemis[i], compteurs_ennemis[i], changement, &emplacement);
 
-                    if (compteurs_ennemis[i]>=compteur_max[i]) compteurs_ennemis[i]=1;
+                    if (compteurs_ennemis[i]>=compteur_max[i]) compteurs_ennemis[i]=1; // gestion du nombre de mouvements de chaque ennemi, le mouvement est cyclique
                     else compteurs_ennemis[i]++;
-                    if (precedent_ennemi[i]==2)
+                    if (precedent_ennemi[i]==2) // vérification: si l'ennemi passe sur le joueur
                     {
+                        // affichage de la situation
                         if (mode_graphique)
                         {
                             update_affichage_graphique(valeurs, affiche, affiche2, mode_graphique);
@@ -595,8 +733,10 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
                             update_tab_affiche(valeurs, affiche_console);
                             affichage(changement, affiche_console, emplacement);
                         }
+                        // Menu de mort
                         switch(afficher_mort(score, niveau, mode_graphique))
                         {
+                            // retour du statut(recommencer ou quitter)
                         case 1:
                             return 1;
                         case 3:
@@ -607,52 +747,51 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
                 compteur=0;
             }
 
-            Sleep(80);
+            Sleep(80); // delai pour limiter la vitesse du jeu
             if (mode_graphique!=0)
             {
+                // réaffichage
                 update_affichage_graphique(valeurs, affiche, affiche2, mode_graphique);
                 affichage_graphique(affiche, mode_graphique, *score, score_niveau, affiche2, valeurs);
-                if (key[KEY_H])
+                if (key[KEY_H]) // affichage des regles
                 {
                     afficher_menu_graphique();
-                    while (key[KEY_H]);
-                }
-                if (key[KEY_SPACE])
-                {
-                    Sleep(40);
-                    while (!key[KEY_SPACE]);
-                    Sleep(30);
+                    while (key[KEY_H]); // le menu est affiché tant que l'utilisateur maintiens h
                 }
             }
             else
             {
-                update_tab_affiche(valeurs, affiche_console);
-                affichage(changement, affiche_console, emplacement);
-                affichage_score(score, score_niveau);
+                update_tab_affiche(valeurs, affiche_console); // reafraichit le tableau d'affichage console
+                affichage(changement, affiche_console, emplacement); // réaffiche uniquement les cases qui ont changé pendant ce tour de boucle
+                affichage_score(score, score_niveau); // réaffiche le score
 
             }
-            nb_cases_eau= update_cases_eau(valeurs);
-            recherche_joueur(valeurs, &x, &y);
-            time(&mesure);
-            if(difftime(mesure, debut))score_niveau= ((int)difftime(mesure, debut)+1000)*nb_cases_eau/(int)difftime(mesure, debut);
+            nb_cases_eau= update_cases_eau(valeurs); // on recompte le nombre de cases passées par le joueur
+            recherche_joueur(valeurs, &x, &y);// on trouve le joueur
+            time(&mesure); // on obtiens le temps
+            if(difftime(mesure, debut))score_niveau= ((int)difftime(mesure, debut)+1000)*nb_cases_eau/(int)difftime(mesure, debut); //on calcule le score en fonction du temps et du nombre de cases passées
             if((x!=xsortie)||(y!=ysortie))
             {
-                switch (TEST_DIE(valeurs, cle, niveau, score, precedent, mode_graphique, marteau))
+                switch (TEST_DIE(valeurs, cle, niveau, score, precedent, mode_graphique, marteau)) // test si le joueur est mort
                 {
+                    // valeurs de retour
                 case 1:
                     return 1;
                 case 3:
                     return 3;
                 }
             }
-            if ((x==xsortie)&&(y==ysortie)&&(nb_cases_eau!=nb_cases_glace))
+            if ((x==xsortie)&&(y==ysortie)&&(nb_cases_eau!=nb_cases_glace)) //si le joueur est a la sortie mais a manqué des cases
             {
                 //system("cls");
-                if(mode_graphique) allegro_message("Vous avez oublie %d %d-%d cases!",niveau,nb_cases_glace,nb_cases_eau);
-                else printf("\n\nVous avez oublie %d - %d cases!", nb_cases_glace, nb_cases_eau);
+                if(mode_graphique) allegro_message("Vous avez oublie %d %d-%d cases!",niveau,nb_cases_glace,nb_cases_eau); // message signifiant l'échec
+                else {
+                printf("\n\nVous avez oublie %d - %d cases!", nb_cases_glace, nb_cases_eau); // idem
                 Sleep(1000);
-                switch(afficher_mort(score, niveau, mode_graphique))
+                }
+                switch(afficher_mort(score, niveau, mode_graphique)) // affichage de mort
                 {
+                    // valeurs de retour
                 case 1:
                     return 1;
                 case 3:
@@ -660,31 +799,31 @@ int jeu_graphique(int niveau, int* score, int mode_graphique, char mot[50])
                 }
 
             }
-            compteur++;
+            compteur++; // incrément du compteur des ennemis
         }
-        if(tunnel)
+        if(tunnel) // compteur vérifiant la présence d'un tunnel
         {
-            tunnel=0;
-            initialisation_niveau(fichier[niveau], valeurs);
-            precedent=0;
-            if(mode_graphique==0)
+            tunnel=0; // remise a 0
+            initialisation_niveau(fichier[niveau], valeurs); // le tableau suivant se trouve directement a la suite dans le fichier texte, il suffit de rappeler la fonction
+            precedent=0; // remise a 0 de la case sur laquelle le presonnage est
+            if(mode_graphique==0) // cas spécial pour la console affichage du tableau complet
             {
-                gotoligcol(POS_ECRAN_Y,POS_ECRAN_X);
-
+                getsonsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);
+                gotoligcol(POS_ECRAN_Y,POS_ECRAN_X); // vérification d ela pos. du jeu sur la fenêtre
                 update_tab_affiche(valeurs, affiche_console);
-                initialisation_console(affiche_console, *score, score_niveau);
+                initialisation_console(affiche_console, *score, score_niveau); // affichage du tableau complet
             }
-            nb_cases_glace= update_cases_glace(valeurs);
-            nb_cases_eau= 0;
-            recherche_sortie_et_ennemis(valeurs, &xsortie, &ysortie, &tunnel, &nb_ennemis);
-            recherche_joueur(valeurs, &x, &y);
+            nb_cases_glace= update_cases_glace(valeurs); // comptage des cases a détruire sur le niveau
+            nb_cases_eau= 0; // réinistialisation du nombre de cases d'eau
+            recherche_sortie_et_ennemis(valeurs, &xsortie, &ysortie, &tunnel, &nb_ennemis); // recherche de la sortie et des potentiels ennemis
+            recherche_joueur(valeurs, &x, &y); //recherche du joueur
         }
-        else
+        else // pas de tunnel
         {
-            boucle=0;
+            boucle=0; // sorite de la boucle
         }
     }
-    for (i=0; i<NBSPRITE; i++) if(affiche2[i]!=NULL)destroy_bitmap(affiche2[i]);
-    (*score)+=score_niveau;
-    return 0;
+    for (i=0; i<NBSPRITE; i++) if(affiche2[i]!=NULL)destroy_bitmap(affiche2[i]); // destruction de toutes les images
+    (*score)+=score_niveau; // incrément du score général
+    return 0; // retour normal d'exécution
 }
