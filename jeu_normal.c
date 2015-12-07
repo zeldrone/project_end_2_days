@@ -33,46 +33,57 @@ void objets(int *emplacement, int *precedent, int* potion, char tab[15][19], int
         *potion= *potion+6;//Valable 6 cases d'affilés
         *precedent=0;
         break;
-    case 5:
+    case 5: // le rocher
+        // récupération des coordonnées du rocher
         changement[*emplacement][0]=changement[*emplacement-1][0] ;
         changement[*emplacement][1]= changement[*emplacement-1][1];
+        // déplacement das la direction où il est poussé
         changement[*emplacement-1][0]+= direction_x;
         changement[*emplacement-1][1]+= direction_y;
-        while(tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]>=0)
+        while(tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]>=0) //tant que la case suivante est positive
         {
+            // on fait avancer le rocher
             tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]=tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]];
             // on met de l'eau a la place du rocher
             tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]]=-1;
+            // on se postionne pour réafficher en direct
             gotoligcol(POS_ECRAN_Y+changement[*emplacement-1][1],POS_ECRAN_X+3*(changement[*emplacement-1][0]));
             update_tab_affiche(tab, affiche);
             printf(" %c", affiche[changement[*emplacement-1][1]][changement[*emplacement-1][0]]);
+            // on incrémente les cordonnées du rocher
             changement[*emplacement-1][0]+= direction_x;
             changement[*emplacement-1][1]+= direction_y;
-
-
         }
         tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]]=-1;
+        // le rocher disparait au profit de l'eau
         *precedent=0;
+        // enregistre que le joueur est au-dessus de la glace
         (*emplacement)++;
+        // on retiens les cases a réafficher
         break;
-    case 8:
+    case 8: // le turbo (découvert par le rocher)
 
         changement[*emplacement][0]=changement[*emplacement-1][0] ;
-        changement[*emplacement][1]= changement[*emplacement-1][1];
-        while(tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]>=0)
+        changement[*emplacement][1]= changement[*emplacement-1][1]; // on récupère les coordonées
+        while(tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]>=0) // tant que le personnage ne rencontre pas de mur
         {
-            buffer2=tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x];
-            tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]=tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]];
-            tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]]=buffer;
-            buffer=buffer2;
+            buffer2=tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]; // on enregistre la case qui est passée
+            tab[changement[*emplacement-1][1]+direction_y][changement[*emplacement-1][0]+direction_x]=tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]]; // on incrémente la position du personnage
+            tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]]=buffer; // on remet la bonne case
+            buffer=buffer2; // on remplace la case précédente
+            // on se place pour afficher
             gotoligcol(POS_ECRAN_Y+changement[*emplacement-1][1],POS_ECRAN_X+2*changement[*emplacement-1][0]);
-            update_tab_affiche(tab, affiche);
+            update_tab_affiche(tab, affiche); 
+            // on affiche
             printf(" %c", affiche[changement[*emplacement-1][1]][changement[*emplacement-1][0]]);
+            // on incrémente la position
             changement[*emplacement-1][0]+= direction_x;
             changement[*emplacement-1][1]+= direction_y;
+            // on place le joueur
             tab[changement[*emplacement-1][1]][changement[*emplacement-1][0]]=2;
 
         }
+        // on retiens que le joueur est sur une case de glace
         *precedent=0;
         (*emplacement)++;
 
