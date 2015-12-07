@@ -27,7 +27,7 @@ void afficher_menu_principal()
         printf ("Ecrivez 'scores' pour acceder aux scores precedentd\n");
         printf ("Ecrivez 'quitter' pour quitter le jeu !\n");
 }
-void game_exit(int mode_graphique, int buff, int score)
+void game_exit(int mode_graphique, int buff, int score, int niveau)
 {////////////////////////////////////////////////
  //Nom:game_exit
  //Entrées :mode_graphique,buff,score
@@ -38,21 +38,26 @@ void game_exit(int mode_graphique, int buff, int score)
  ////////////////////////////////////////////////
     char input[50];
     int i;
+    FILE* sauvegarde;
+    sauvegarde= fopen("niveausauvegarde.txt", "w");
+    fprintf(sauvegarde, "%d", buff);
+    fclose(sauvegarde);
     if (mode_graphique)//mode graphique
             {
                 BITMAP* buffer;
-                buffer=create_bitmap(TSPRITE*19, TSPRITE*15);
-                clear_to_color(buffer,makecol(0,0,0));
-                if(menu_oui_non(buffer, "score"));
+                buffer=create_bitmap(TSPRITE*19, TSPRITE*15);// image d ela taille de l'écran
+                clear_to_color(buffer,makecol(0,0,0)); // passge de l'image au noir
+                if(menu_oui_non(buffer, "score")); // menu oui non proposant de sauvegarder le "score"
                 else
                 {
-                    saisie_nom(input);
-                    sauvegarde_score(input, score);
+                    saisie_nom(input); // saisie du nom
+                    sauvegarde_score(input, score); // enregistrement du score
                 }
+                clear_bitmap(screen);
                 destroy_bitmap(buffer);
                 clear_keybuf();
                 set_gfx_mode(GFX_TEXT,80,25,0,0);
-                allegro_exit();
+                allegro_exit();// sortie d'allegro
             }
     else
      {
@@ -137,6 +142,7 @@ void saisie_nom(char imput[50])
             }
         }
     }
+    clear_bitmap(screen);
     destroy_bitmap(buffer);
     destroy_bitmap(sauvegarde);
 }
@@ -296,7 +302,7 @@ void fonction_options (int* score, int* mode_graphique, int *mode_son)
  //Version : 
  ////////////////////////////////////////////////
     int choix;
-    printf ("souhaitez-vous:\n1 passer en mode graphique\n2 passer en mode graphique et rejoindre le cote obscur de la force\n");//on informe l'utilisateur des différentes options possibles
+    printf ("souhaitez-vous:\n1 passer en mode graphique\n2 passer en mode graphique et rejoindre le cote obscur de la force\n3 passer en mode console");//on informe l'utilisateur des différentes options possibles
     scanf("%d", &choix );//enregistre le choix de l'utilisateur
     switch (choix)
     {
@@ -305,10 +311,13 @@ void fonction_options (int* score, int* mode_graphique, int *mode_son)
         break;
     case 2:
         *mode_graphique=2;//active le mode star wars
+        break;
+    case 3:
+        *mode_graphique=0;// passe en mode console
     }
 
 }
-void fonction_admin (int mode_graphique, int* score)
+void fonction_admin (int mode_graphique, int* score, int niveau)
 {////////////////////////////////////////////////
  //Nom:fonction_admin
  //Entrées :mode_graphique,*score
@@ -318,6 +327,7 @@ void fonction_admin (int mode_graphique, int* score)
  //Version : 5.0
  ////////////////////////////////////////////////
     int entre,i=0;
+    int buff;
     char x=1;
     int POS_ECRAN_Y=0;
     int POS_ECRAN_X=0;
@@ -337,6 +347,7 @@ void fonction_admin (int mode_graphique, int* score)
             else getconsole_size(&POS_ECRAN_X, &POS_ECRAN_Y);//initialise la console
             for(i=entre; i<=5; i++)
             {
+             buff=i;
                 switch(jeu_graphique(i-1, score, mode_graphique, NULL))
                 {
                 case 1://recommencer le niveau
@@ -346,6 +357,7 @@ void fonction_admin (int mode_graphique, int* score)
                     i=5;
                 }
             }
+            game_exit(mode_graphique, buff, score);//appel de la fonction pour quitter le jeu
             x=0;
             break;
         default:
@@ -391,7 +403,7 @@ int main()//main
                     niveau=5;
                 }
             }
-            game_exit(mode_graphique, buff, score);//appel de la fonction pour quitter le jeu
+            game_exit(mode_graphique, buff, score, niveau);//appel de la fonction pour quitter le jeu
         }
         else if (strcmp (imput,"reprendre")==0)//lance le dernier niveau sauvegardé si l'utilisateur a choisi reprendre dans le menu
         {
@@ -421,12 +433,11 @@ int main()//main
         }
         else if (strcmp (imput, "quitter")==0)//quitte le jeu
         {
-            return 0;
+            fin_de_niveau(niveau);
         }
         else if (strcmp (imput, "admin")==0)//fonction admin pour accéder a tous les niveaux
         {
             fonction_admin(mode_graphique, &score);//appel de la fonction admin
-            x++;
         }
         else if(strcmp (imput, "editer")==0)//lance le level editor sous allegro
         {
