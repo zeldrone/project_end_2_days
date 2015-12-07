@@ -1,3 +1,4 @@
+
 #include<allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,29 +8,44 @@
 #include "header_allegro.h"
 #include <allegro.h>
 #define LIGNE text_height(font)
+/////////////////////////////////////////
+// nom: page_flip
+//utilité: gérer un affichage a deux images virtuelles
+//dernière modif: Baptiste, commentaire,06/12
+//entrées: le tableau d'affichage, le pointeur sur le numero de l'image utilisée
+////////////////////////////////////////
 void page_flip(BITMAP* affiche[15][19], int* page)
 {
+    //0 declaration de variables
     BITMAP* buffer1;
     BITMAP* buffer2;
-    scare_mouse();
+    scare_mouse(); // on cache la souris
     if(*page)
     {
-        buffer1= affiche_buffer(affiche);
-        blit(buffer1, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
-        destroy_bitmap(buffer1);
-        *page=0;
+        buffer1= affiche_buffer(affiche); // on charge l'image demandée
+        blit(buffer1, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE); // on l'affiche
+        destroy_bitmap(buffer1); // on détruis la mémoire
+        *page=0; // on change la page
     }
     else
     {
+        // idem
         buffer2= affiche_buffer(affiche);
         blit(buffer2, screen,0,0,0,0, 19*TSPRITE, 15*TSPRITE);
         destroy_bitmap(buffer2);
         *page=1;
     }
-    unscare_mouse();
+    unscare_mouse(); // on réaffiche la souris
 }
+/////////////////////////////////////////
+// nom: ennemy_editor
+//utilité: définition des mouvements des ennemis par l'utilisateur
+//dernière modif: Baptiste, commentaire,06/12
+//entrées: le tableau d'affichage, le tableau de valeurs, le nom du niveau
+////////////////////////////////////////
 int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
 {
+    //0 declaration de variables
     int i,j,a=0;
     int nb_ennemi = 0;
     int deplacements_ennemis[50]= {0};
@@ -40,29 +56,30 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
     BITMAP* buffer;
     BITMAP* chemin;
     BITMAP* depart;
-    chemin = load_bitmap("passee.bmp", NULL);
-    depart = load_bitmap("case_depart.bmp", NULL);
-    init_mode_graphique(1, affiche2);
-    buffer=create_bitmap(TSPRITE*19,TSPRITE*15);
-    buffer=affiche_buffer(affiche);
     FILE* fichier=NULL;
+    //1 initialisations
+    chemin = load_bitmap("passee.bmp", NULL); // indicateur qu'une case fais partie du chemin passé par l'ennemi
+    depart = load_bitmap("case_depart.bmp", NULL); // indicateur de la case de départ
+    init_mode_graphique(1, affiche2); // chargement des images du jeu
+    buffer=create_bitmap(TSPRITE*19,TSPRITE*15);
+    buffer=affiche_buffer(affiche); // chargement du niveau tel qu'il a été dessiné
     for (i=0; i<15; i++)
     {
         for(j=0; j<19; j++)
         {
-            if (tab[i][j]==66) nb_ennemi++;
+            if (tab[i][j]==66) nb_ennemi++;// Comptage des ennemis
         }
     }
     i=0;
     j=0;
-    int coord_ennemis[nb_ennemi][2];
+    int coord_ennemis[nb_ennemi][2];  // tableau des coordonnées de tous les ennemis
     for (i=0; i<15; i++)
     {
         for(j=0; j<19; j++)
         {
             if (tab[i][j]==66)
             {
-                coord_ennemis[a][0]=j;
+                coord_ennemis[a][0]=j;  // enregistrement des différentes coordonnées
                 coord_ennemis[a++][1]=i;
             }
         }
@@ -72,12 +89,12 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
         j=0;
         for(j=0; j<nb_ennemi; j++)
         {
-            affiche[coord_ennemis[j][1]][coord_ennemis[j][0]]=affiche2[7];
+            affiche[coord_ennemis[j][1]][coord_ennemis[j][0]]=affiche2[7]; // on cache tous les ennemis par de la glace
         }
 
-        if (strlen(niveau)<40)
+        if (strlen(niveau)<40) // si le nom permet de le supporter
         {
-            sprintf(buffert, "ennemi.%s.%d.txt", niveau, i);
+            sprintf(buffert, "ennemi.%s.%d.txt", niveau, i); //on ouvre le fichier de l'ennemi qui nous intéresse
             fopen(buffert, "w");
         }
         else
@@ -85,8 +102,8 @@ int ennemy_editor(BITMAP* affiche[15][19], int tab[15][19], char niveau[50])
             allegro_message("le nom est trop long!");
             return 0;
         }
-        affiche[coord_ennemis[i][1]][coord_ennemis[i][0]]=affiche2[5];
-        buffer=affiche_buffer(affiche);
+        affiche[coord_ennemis[i][1]][coord_ennemis[i][0]]=affiche2[5]; // affichage de l'ennemi qui nous intéresse
+        buffer=affiche_buffer(affiche);  // on recharge le niveau avec ces nouvelles valeurs
         a=1;
         deplacements_ennemis[0]=49;
         rest(100);
